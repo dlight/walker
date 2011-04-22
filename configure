@@ -1,0 +1,20 @@
+#!/bin/bash
+
+casa=casa1
+
+if [[ $1 = '--casa' ]]; then
+    casa=$2
+else
+    casa=1
+fi
+
+genh() {
+cat <<tac
+#include "$1$2.h"
+
+#define ${1}NumVerts ${1}${2}NumVerts
+#define ${1}Verts ${1}${2}Verts
+tac
+}
+
+genh casa $casa > mesh/casa.h
