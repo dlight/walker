@@ -9,8 +9,6 @@
 
 int res_x = 640, res_y = 480; /* resolucao padrao */
 
-float FPS_max = 60;           /* fps maximo */
-
 float vel = 0.4;              /* velocidade linear */
 float theta_vel = 0.1;        /* velocidade angular */
 
@@ -43,7 +41,6 @@ void layer(float posz)
 
 void draw()
 {
-    //    return;
     glClear (GL_COLOR_BUFFER_BIT);
     glColor3f (1.0, 1.0, 1.0);
     glLoadIdentity ();
@@ -65,8 +62,6 @@ void draw()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     SDL_GL_SwapBuffers();
-
-    //printf("glGetError: %d\n", glGetError());
 }
 
 void initVBO()
@@ -170,17 +165,14 @@ int main(int argc, char *argv[])
         else
             event_handler(ev);
 
-    Uint32 old_tick = SDL_GetTicks();
-    Uint32 old_boundary = old_tick / 1000;
+    Uint32 old_boundary = SDL_GetTicks() / 1000;
     int count = 0;
-    float acc = 0;
 
     while (1) {
         while (SDL_PollEvent(&ev))
             event_handler(ev);
 
-	Uint32 new_tick = SDL_GetTicks();
-        int new_boundary = new_tick / 1000;
+        int new_boundary = SDL_GetTicks() / 1000;
 
         if (new_boundary > old_boundary) {
             printf("fps: %d\n", count);
@@ -188,13 +180,7 @@ int main(int argc, char *argv[])
             count = 0;
         }
 
-        acc += new_tick - old_tick;
-        old_tick = new_tick;
-
-        if (acc >= (1000.0 / FPS_max)) {
-            acc -= (1000.0 / FPS_max);
-            count++;
-            draw();
-        }
+        count++;
+        draw();
     }
 }
