@@ -7,6 +7,8 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
 
+#include <GL/freeglut.h>
+
 int res_x = 640, res_y = 480; /* resolucao padrao */
 
 float vel = 0.4;              /* velocidade linear */
@@ -14,6 +16,8 @@ float theta_vel = 0.1;        /* velocidade angular */
 
 float theta = 0;              /* orientacao inicial */
 float pos_x = 0, pos_z = 10 ; /* posicao inicial */ 
+
+char fps_str[8] = "0 FPS";
 
 GLuint vboID;
 
@@ -39,20 +43,47 @@ void layer(float posz)
     }
 }
 
+
+
+void draw_fps()
+{
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, res_x, 0, res_y);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glColor3f(1, 0.4, 0);
+    glRasterPos2i(10, 10);
+    glutBitmapString(GLUT_BITMAP_8_BY_13, fps_str);
+}
+
+void setup_projection()
+{
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    gluPerspective(45,
+                   (GLfloat) res_x /
+                   (GLfloat) res_y, 1, 200);
+    glMatrixMode (GL_MODELVIEW);
+}
+
 void draw()
 {
-    glClear (GL_COLOR_BUFFER_BIT);
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor3f (1.0, 1.0, 1.0);
+
+    setup_projection();
     glLoadIdentity ();
 
     glRotatef(theta, 0, -1, 0);
     glTranslatef(-pos_x, 0, -pos_z);
 
-       layer(0);
+    layer(0);
 
-        glScalef(20, 20, 20);
+    glScalef(20, 20, 20);
 
-        glBindBuffer(GL_ARRAY_BUFFER, vboID);
+    glBindBuffer(GL_ARRAY_BUFFER, vboID);
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, 0);
@@ -61,17 +92,19 @@ void draw()
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    draw_fps();
+
     SDL_GL_SwapBuffers();
 }
 
 void initVBO()
 {
-	glGenBuffers(1, &vboID);
-        glBindBuffer(GL_ARRAY_BUFFER, vboID);
-        glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(float) * casaNumVerts, casaVerts,
-                     GL_STATIC_DRAW);
+    glGenBuffers(1, &vboID);
+    glBindBuffer(GL_ARRAY_BUFFER, vboID);
+    glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(float) * casaNumVerts, casaVerts,
+                 GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void initgl()
@@ -79,12 +112,6 @@ void initgl()
     glClearColor (0.0, 0.0, 0.0, 0.0);
 
     glViewport (0, 0, res_x, res_y); 
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    gluPerspective(45,
-                   (GLfloat) res_x /
-                   (GLfloat) res_y, 1, 100);
-    glMatrixMode (GL_MODELVIEW);
 
     initVBO();
 }
@@ -176,6 +203,7 @@ int main(int argc, char *argv[])
 
         if (new_boundary > old_boundary) {
             printf("fps: %d\n", count);
+            snprintf(fps_str, 8, "%d FPS", count);
             old_boundary = new_boundary;
             count = 0;
         }

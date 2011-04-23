@@ -2,6 +2,7 @@ Programa incompleto. Testado so no linux.
 
 Dependencias:
  * opengl
+ * freeglut
  * sdl
 
 Para compilar:
