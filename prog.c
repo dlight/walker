@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "mesh/casa.h"
+#include "mesh/terreno.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
@@ -87,7 +87,7 @@ void draw()
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, 0);
-    glDrawArrays(GL_TRIANGLES, 0, casaNumVerts);
+    glDrawArrays(GL_TRIANGLES, 0, terrenoNumVerts);
     glDisableClientState(GL_VERTEX_ARRAY);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -101,7 +101,8 @@ void initVBO()
 {
     glGenBuffers(1, &vboID);
     glBindBuffer(GL_ARRAY_BUFFER, vboID);
-    glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(float) * casaNumVerts, casaVerts,
+    glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(float) * terrenoNumVerts,
+                 terrenoVerts,
                  GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -112,6 +113,8 @@ void initgl()
     glClearColor (0.0, 0.0, 0.0, 0.0);
 
     glViewport (0, 0, res_x, res_y); 
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     initVBO();
 }

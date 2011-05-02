@@ -2,19 +2,33 @@
 
 casa=casa1
 
-if [[ $1 = '--casa' ]]; then
-    casa=$2
+if [[ $1 == '--os' ]]; then
+    os=$2
+    shift
+    shift
 else
-    casa=1
+    if sw_vers 2> /dev/null; then
+        os=mac
+    else
+        os=linux
+    fi
 fi
+
+if [[ $1 = '--terreno' ]]; then
+    terreno=$2
+else
+    terreno=terrain
+fi
+
+echo PLATFORM = $os > make.platform
 
 genh() {
 cat <<tac
-#include "$1$2.h"
+#include "$1.h"
 
-#define ${1}NumVerts ${1}${2}NumVerts
-#define ${1}Verts ${1}${2}Verts
+#define terrenoNumVerts ${1}NumVerts
+#define terrenoVerts ${1}Verts
 tac
 }
 
-genh casa $casa > mesh/casa.h
+genh $terreno > mesh/terreno.h
