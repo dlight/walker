@@ -13,8 +13,9 @@
 
 int res_x = 640, res_y = 480;  /* resolucao padrao */
 
-float vel = 50*0.03125;           /* velocidade linear */
-float theta_vel = 50*0.00390625;  /* velocidade angular */
+float vel = 4;           /* velocidade linear */
+
+float ang_vel = 0.2;  /* velocidade angular */
 
 float theta = 0;               /* orientacao no plano xz */
 float phi = 0;                 /* orientacao no plano xy */
@@ -25,6 +26,8 @@ float min_phi = -45;
 float pos_x = 0;               /* posicao inicial */ 
 float pos_y = 0;
 float pos_z = 10;
+
+char key_pressed[256];
 
 char fps_str[8] = "0 FPS";
 
@@ -138,7 +141,7 @@ void initgl()
     initVBO();
 }
 
-void event_handler(SDL_Event ev, float dt)
+void event_handler(SDL_Event ev)
 {
     if (ev.type == SDL_QUIT ||
         (ev.type == SDL_KEYDOWN &&
@@ -149,8 +152,8 @@ void event_handler(SDL_Event ev, float dt)
     }
 
     if (ev.type == SDL_MOUSEMOTION) {
-        theta -= ev.motion.xrel * theta_vel * dt;
-        phi -= ev.motion.yrel * theta_vel * dt;
+        theta -= ev.motion.xrel * ang_vel;
+        phi -= ev.motion.yrel * ang_vel;
 
         if (phi > max_phi)
             phi = max_phi;
@@ -158,26 +161,35 @@ void event_handler(SDL_Event ev, float dt)
             phi = min_phi;
     }
     else if (ev.type == SDL_KEYDOWN) {
-        float vel_sin = vel * sin(M_PI * theta / 180) * dt;
-        float vel_cos = vel * cos(M_PI * theta / 180) * dt;
+        printf("enabled\n");
+        key_pressed[ev.key.keysym.sym] = 1;
+    }
+    else if (ev.type == SDL_KEYUP) {
+        printf("disabled\n");
+        key_pressed[ev.key.keysym.sym] = 0;
+    };
+}
 
-        switch(ev.key.keysym.sym) {
-        case 'w':
-            pos_x -= vel_sin;
-            pos_z -= vel_cos;
-            break;
-        case 's':
-            pos_x += vel_sin;
-            pos_z += vel_cos;
-            break;
-        case 'a':
-            pos_x -= vel_cos;
-            pos_z += vel_sin;
-            break;
-        case 'd':
-            pos_x += vel_cos;
-            pos_z -= vel_sin;
-        }
+void physics(float dt)
+{
+    float vel_sin = vel * sin(M_PI * theta / 180) * dt;
+    float vel_cos = vel * cos(M_PI * theta / 180) * dt;
+
+    if (key_pressed['w']) {
+        pos_x -= vel_sin;
+        pos_z -= vel_cos;
+    }
+    if (key_pressed['s']) {
+        pos_x += vel_sin;
+        pos_z += vel_cos;
+    }
+    if (key_pressed['a']) {
+        pos_x -= vel_cos;
+        pos_z += vel_sin;
+    }
+    if (key_pressed['d']) {
+        pos_x += vel_cos;
+        pos_z -= vel_sin;
     }
 }
 
@@ -198,6 +210,8 @@ int main(int argc, char *argv[])
         res_y = atoi(argv[shift+1]);
     }
 
+    memset(key_pressed, 0, 256);
+
     glutInit(&argc, argv);
 
     putenv("SDL_VIDEO_CENTERED=1");
@@ -205,8 +219,6 @@ int main(int argc, char *argv[])
     SDL_ShowCursor(SDL_DISABLE);
     SDL_WM_GrabInput(SDL_GRAB_ON);
     SDL_Surface* sdl = SDL_SetVideoMode(res_x, res_y, 32, mode);
-
-    SDL_EnableKeyRepeat(1, 1);
 
     initgl();
 
@@ -217,7 +229,7 @@ int main(int argc, char *argv[])
             || ev.type == SDL_MOUSEMOTION)
             break;
         else
-            event_handler(ev, 0);
+            event_handler(ev);
 
     struct timespec old_time, new_time;
 
@@ -227,11 +239,11 @@ int main(int argc, char *argv[])
     int count = 0;
 
     while (1) {
+        while (SDL_PollEvent(&ev))
+            event_handler(ev);
+
         clock_gettime(CLOCK_MONOTONIC, &new_time);
         dt = timespec_diff(new_time, old_time);
-
-        while (SDL_PollEvent(&ev))
-            event_handler(ev, dt);
 
         if (new_time.tv_sec > old_time.tv_sec) {
             printf("fps: %d\n", count);
@@ -239,9 +251,10 @@ int main(int argc, char *argv[])
             count = 0;
         }
 
-        printf("%f\n", dt);
         old_time = new_time;
         count++;
+
+        physics(dt);
         draw();
     }
 }
