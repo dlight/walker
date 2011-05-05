@@ -15,7 +15,14 @@ float vel = 0.03125;           /* velocidade linear */
 float theta_vel = 0.00390625;  /* velocidade angular */
 
 float theta = 0;               /* orientacao no plano xz */
-float pos_x = 0, pos_z = 10;   /* posicao inicial */ 
+float phi = 0;                 /* orientacao no plano xy */
+
+float max_phi = 45;            /* limitacao ao olhar pra cima */
+float min_phi = -45;
+
+float pos_x = 0;               /* posicao inicial */ 
+float pos_y = 0;
+float pos_z = 10;
 
 char fps_str[8] = "0 FPS";
 
@@ -76,6 +83,7 @@ void draw()
     setup_projection();
     glLoadIdentity ();
 
+    glRotatef(phi, -1, 0, 0);
     glRotatef(theta, 0, -1, 0);
     glTranslatef(-pos_x, 0, -pos_z);
 
@@ -131,6 +139,12 @@ void event_handler(SDL_Event ev, float dt)
 
     if (ev.type == SDL_MOUSEMOTION) {
         theta -= ev.motion.xrel * theta_vel * dt;
+        phi -= ev.motion.yrel * theta_vel * dt;
+
+        if (phi > max_phi)
+            phi = max_phi;
+        else if (phi < min_phi)
+            phi = min_phi;
     }
     else if (ev.type == SDL_KEYDOWN) {
         float vel_sin = vel * sin(M_PI * theta / 180) * dt;
