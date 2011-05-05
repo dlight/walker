@@ -99,7 +99,7 @@ void draw()
 
     glRotatef(phi, -1, 0, 0);
     glRotatef(theta, 0, -1, 0);
-    glTranslatef(-pos_x, 0, -pos_z);
+    glTranslatef(-pos_x, -pos_y, -pos_z);
 
     layer(0);
 
@@ -174,6 +174,13 @@ void physics(float dt)
 {
     float vel_sin = vel * sin(M_PI * theta / 180) * dt;
     float vel_cos = vel * cos(M_PI * theta / 180) * dt;
+
+    if (key_pressed['q']) {
+        pos_y += vel * dt;
+    }
+    if (key_pressed['e']) {
+        pos_y -= vel * dt;
+    }
 
     if (key_pressed['w']) {
         pos_x -= vel_sin;
