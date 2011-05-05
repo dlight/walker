@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <time.h>
+
 #include "mesh/terreno.h"
 
 #include <SDL/SDL.h>
@@ -11,8 +13,8 @@
 
 int res_x = 640, res_y = 480;  /* resolucao padrao */
 
-float vel = 0.03125;           /* velocidade linear */
-float theta_vel = 0.00390625;  /* velocidade angular */
+float vel = 50*0.03125;           /* velocidade linear */
+float theta_vel = 50*0.00390625;  /* velocidade angular */
 
 float theta = 0;               /* orientacao no plano xz */
 float phi = 0;                 /* orientacao no plano xy */
@@ -27,6 +29,15 @@ float pos_z = 10;
 char fps_str[8] = "0 FPS";
 
 GLuint vboID;
+
+float timespec_diff(struct timespec end,
+                              struct timespec start)
+{
+    float nsec = end.tv_nsec - start.tv_nsec;
+
+    return (end.tv_sec - start.tv_sec) +
+        nsec / 1000000000;
+}
 
 void cubep(float posx, float posy, float posz)
 {
@@ -201,7 +212,6 @@ int main(int argc, char *argv[])
 
     SDL_Event ev;
 
-    // ignore the first mouse motion
     while (1)
         if (! SDL_PollEvent(&ev)
             || ev.type == SDL_MOUSEMOTION)
@@ -209,28 +219,29 @@ int main(int argc, char *argv[])
         else
             event_handler(ev, 0);
 
-    int old_time = SDL_GetTicks();
-    int old_boundary = old_time / 1000;
+    struct timespec old_time, new_time;
+
+    clock_gettime(CLOCK_MONOTONIC, &old_time);
+
     float dt = 0;
     int count = 0;
 
     while (1) {
-        int new_time = SDL_GetTicks();
-        int new_boundary = new_time / 1000;
-
-        if (new_boundary > old_boundary) {
-            printf("fps: %d\n", count);
-            snprintf(fps_str, 8, "%d FPS", count);
-            old_boundary = new_boundary;
-            count = 0;
-        }
-
-        dt = new_time - old_time;
-        old_time = new_time;
-        count++;
-        draw();
+        clock_gettime(CLOCK_MONOTONIC, &new_time);
+        dt = timespec_diff(new_time, old_time);
 
         while (SDL_PollEvent(&ev))
             event_handler(ev, dt);
+
+        if (new_time.tv_sec > old_time.tv_sec) {
+            printf("fps: %d\n", count);
+            snprintf(fps_str, 8, "%d FPS", count);
+            count = 0;
+        }
+
+        printf("%f\n", dt);
+        old_time = new_time;
+        count++;
+        draw();
     }
 }
