@@ -9,13 +9,13 @@
 
 #include <GL/freeglut.h>
 
-int res_x = 640, res_y = 480; /* resolucao padrao */
+int res_x = 640, res_y = 480;  /* resolucao padrao */
 
-float vel = 0.4;              /* velocidade linear */
-float theta_vel = 0.1;        /* velocidade angular */
+float vel = 0.03125;           /* velocidade linear */
+float theta_vel = 0.00390625;  /* velocidade angular */
 
-float theta = 0;              /* orientacao inicial */
-float pos_x = 0, pos_z = 10 ; /* posicao inicial */ 
+float theta = 0;               /* orientacao no plano xz */
+float pos_x = 0, pos_z = 10;   /* posicao inicial */ 
 
 char fps_str[8] = "0 FPS";
 
@@ -119,7 +119,7 @@ void initgl()
     initVBO();
 }
 
-void event_handler(SDL_Event ev)
+void event_handler(SDL_Event ev, float dt)
 {
     if (ev.type == SDL_QUIT ||
         (ev.type == SDL_KEYDOWN &&
@@ -130,11 +130,11 @@ void event_handler(SDL_Event ev)
     }
 
     if (ev.type == SDL_MOUSEMOTION) {
-        theta -= ev.motion.xrel * theta_vel;
+        theta -= ev.motion.xrel * theta_vel * dt;
     }
     else if (ev.type == SDL_KEYDOWN) {
-        float vel_sin = vel * sin(M_PI * theta / 180);
-        float vel_cos = vel * cos(M_PI * theta / 180);
+        float vel_sin = vel * sin(M_PI * theta / 180) * dt;
+        float vel_cos = vel * cos(M_PI * theta / 180) * dt;
 
         switch(ev.key.keysym.sym) {
         case 'w':
@@ -193,16 +193,16 @@ int main(int argc, char *argv[])
             || ev.type == SDL_MOUSEMOTION)
             break;
         else
-            event_handler(ev);
+            event_handler(ev, 0);
 
-    Uint32 old_boundary = SDL_GetTicks() / 1000;
+    int old_time = SDL_GetTicks();
+    int old_boundary = old_time / 1000;
+    float dt = 0;
     int count = 0;
 
     while (1) {
-        while (SDL_PollEvent(&ev))
-            event_handler(ev);
-
-        int new_boundary = SDL_GetTicks() / 1000;
+        int new_time = SDL_GetTicks();
+        int new_boundary = new_time / 1000;
 
         if (new_boundary > old_boundary) {
             printf("fps: %d\n", count);
@@ -211,7 +211,12 @@ int main(int argc, char *argv[])
             count = 0;
         }
 
+        dt = new_time - old_time;
+        old_time = new_time;
         count++;
         draw();
+
+        while (SDL_PollEvent(&ev))
+            event_handler(ev, dt);
     }
 }
