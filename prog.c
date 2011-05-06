@@ -148,14 +148,33 @@ void initgl()
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
-    float lightColor[] = {0.8, 1.0, 0.8, 1.0};
+    float black[4]={ 0, 0, 0, 0 };
+    float light_gray[4]={ 0.6, 0.6, 0.6, 0 };
+    float dark_gray[4]={ 0.2, 0.2, 0.2, 0 };
 
-    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
+    float greenish[4] = { 0.8, 1, 0.8, 0 };
+
+    //glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, black);
+
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, greenish);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, greenish);
+
     glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
     glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.01);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHTING);
+
+    /* testando.. */
+    float w = 120;
+
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT,GL_DIFFUSE);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, black);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, light_gray);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, dark_gray);
+    glMaterialfv(GL_FRONT, GL_SHININESS, &w);
 }
 
 void event_handler(SDL_Event ev)
