@@ -244,6 +244,14 @@ int main(int argc, char *argv[])
 
     putenv("SDL_VIDEO_CENTERED=1");
     SDL_Init(SDL_INIT_VIDEO);
+
+    const SDL_VideoInfo* info = SDL_GetVideoInfo(); 
+
+    if(!(info->hw_available))
+        printf("%d, %d, %d\n", info->hw_available,
+               info->blit_hw,
+               info->blit_sw);
+
     SDL_ShowCursor(SDL_DISABLE);
     SDL_WM_GrabInput(SDL_GRAB_ON);
     SDL_Surface* sdl = SDL_SetVideoMode(res_x, res_y, 32, mode);
