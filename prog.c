@@ -42,6 +42,8 @@ float ang_vel_light = 10;
 float theta_light = 0;
 
 float light[4] = { 0, 5, 0, 1 };
+float light_color[4] = { 0.8, 1, 0.8, 0 };
+float color_vel = 0.2;
 char stop_light = 0;
 
 char key_pressed[256];
@@ -115,6 +117,9 @@ void draw_light_point()
 
 void draw()
 {
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_color);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_color);
+
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor3f (1.0, 1.0, 1.0);
 
@@ -151,32 +156,27 @@ void initgl()
     glEnable(GL_DEPTH_TEST);
 
     float black[4]={ 0, 0, 0, 0 };
+    float white[4]={ 1, 1, 1, 1 };
     float light_gray[4]={ 0.6, 0.6, 0.6, 0 };
     float dark_gray[4]={ 0.2, 0.2, 0.2, 0 };
 
-    float greenish[4] = { 0.8, 1, 0.8, 0 };
+    float shininess = 120;
 
-    //glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
 
-    glLightfv(GL_LIGHT0, GL_AMBIENT, black);
-
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, greenish);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, greenish);
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, black);
 
     glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
     glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.01);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHTING);
 
-    /* testando.. */
-    float w = 120;
-
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT,GL_DIFFUSE);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, black);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, white);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, light_gray);
     glMaterialfv(GL_FRONT, GL_SPECULAR, dark_gray);
-    glMaterialfv(GL_FRONT, GL_SHININESS, &w);
+    glMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
 }
 
 void event_handler(SDL_Event ev)
@@ -236,6 +236,19 @@ void physics(float dt)
         mypos.x += vel_cos;
         mypos.z -= vel_sin;
     }
+
+    if (key_pressed['r'])
+        light_color[0] += color_vel * dt;
+    if (key_pressed['t'])
+        light_color[0] -= color_vel * dt;
+    if (key_pressed['r'])
+        light_color[1] += color_vel * dt;
+    if (key_pressed['g'])
+        light_color[1] -= color_vel * dt;
+    if (key_pressed['v'])
+        light_color[2] += color_vel * dt;
+    if (key_pressed['b'])
+        light_color[2] -= color_vel * dt;
 
     if (key_hit['p']) {
         key_hit['p'] = 0;
