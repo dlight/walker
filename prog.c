@@ -15,6 +15,8 @@
 #endif
 
 #include "mesh/terrain.h"
+#include "mesh/terrain2.h"
+#include "mesh/terrain3.h"
 
 typedef struct {
     float x;
@@ -28,14 +30,14 @@ float vel = 15;                 /* velocidade linear */
 
 float ang_vel = 0.2;            /* velocidade angular */
 
-float theta = 0;                /* orientacao no plano xz */
+float theta = -93;               /* orientacao no plano xz */
 float phi = 0;                  /* orientacao no plano xy */
 
 float max_phi = 90;             /* limitacao ao olhar pra cima */
 float min_phi = -90;
 
 vec3 mypos =                    /* posicao do personagem */
-    { .x = 0, .y = 0, .z = 15 };
+    { .x = -10, .y = 0, .z = 4 };
 
 
 float light[4] =                 /* posicao da luz */
@@ -48,7 +50,7 @@ float light_color[4] =           /* cor da luz */
 
 float shininess = 128;           /* brilho do material */  
 float diffuse[4]=                /* reflectancia difusa do material */
-    { 0.8, 0.8, 0.8, 1 };
+    { 1.2, 1.2, 1.2, 1 };
 float specular[4]=               /* reflectancia especular do material */
     { 0.2, 0.2, 0.2, 1 };
 
@@ -58,6 +60,8 @@ char key_hit[256];               /* keymap toggle */
 char fps_str[8] = "O FPS";       /* fps na tela */
 char status_str[2][256];         /* variaveis na tela */
 char hide_text = 0;              /* esconder texto */
+
+void (*desenhar_terreno)(void) = terrainDraw;
 
 void cubep(float posx, float posy, float posz)
 {
@@ -157,7 +161,7 @@ void draw()
 
     layer(0);
 
-    terrainDraw();
+    desenhar_terreno();
 
     if (!hide_text)
         draw_status();
@@ -227,6 +231,32 @@ void toggle()
     if (key_hit['o']) {
         key_hit['o'] = 0;
         hide_text = ! hide_text;
+    }
+
+    if (key_hit['j']) {
+        key_hit['j'] = 0;
+        light_color[0] = 0.8;
+        light_color[1] = 1;
+        light_color[2] = 0.8;
+    }
+    if (key_hit['k']) {
+        key_hit['k'] = 0;
+        light_color[0] = 0.75;
+        light_color[1] = 0.6;
+        light_color[2] = 0.45;
+    }
+
+    if (key_hit['1']) {
+        key_hit['1'] = 0;
+        desenhar_terreno = terrainDraw;
+    }
+    if (key_hit['2']) {
+        key_hit['2'] = 0;
+        desenhar_terreno = terrain2Draw;
+    }
+    if (key_hit['3']) {
+        key_hit['3'] = 0;
+        desenhar_terreno = terrain3Draw;
     }
 }
 
