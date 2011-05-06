@@ -24,7 +24,9 @@ typedef struct {
 
 int res_x = 640, res_y = 480;  /* resolucao padrao */
 
-float vel = 10;                /* velocidade linear */
+float vel = 15;                /* velocidade linear */
+
+float vel_vel = 10;
 
 float ang_vel = 0.2;           /* velocidade angular */
 
@@ -209,6 +211,13 @@ void event_handler(SDL_Event ev)
 
 void physics(float dt)
 {
+
+    if (key_pressed['z'])
+        vel += vel_vel * dt;
+
+    if (key_pressed['c'])
+        vel -= vel_vel * dt;
+
     float rad = M_PI / 180;
     float vel_sin = vel * sin(rad * theta) * dt;
     float vel_cos = vel * cos(rad * theta) * dt;
