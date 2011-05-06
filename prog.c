@@ -41,7 +41,7 @@ vec3 mypos = { .x = 0,        /* posicao do personagem */
 float ang_vel_light = 10;
 float theta_light = 0;
 
-float light[4] = { 0, 5, 0, 0 };
+float light[4] = { 0, 5, 0, 1 };
 
 char key_pressed[256];
 
@@ -152,8 +152,8 @@ void initgl()
 
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
-    glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.001);
-    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.001);
+    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
+    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.01);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHTING);
 }
