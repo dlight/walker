@@ -42,8 +42,10 @@ float ang_vel_light = 10;
 float theta_light = 0;
 
 float light[4] = { 0, 5, 0, 1 };
+char stop_light = 0;
 
 char key_pressed[256];
+char key_hit[256];
 
 char fps_str[8] = "0 FPS";
 
@@ -198,6 +200,7 @@ void event_handler(SDL_Event ev)
     }
     else if (ev.type == SDL_KEYDOWN) {
         key_pressed[ev.key.keysym.sym] = 1;
+        key_hit[ev.key.keysym.sym] = 1;
     }
     else if (ev.type == SDL_KEYUP) {
         key_pressed[ev.key.keysym.sym] = 0;
@@ -234,7 +237,14 @@ void physics(float dt)
         mypos.z -= vel_sin;
     }
 
-    theta_light += ang_vel_light * dt;
+    if (key_hit['p']) {
+        key_hit['p'] = 0;
+        stop_light = ! stop_light;
+    }
+
+    if (!stop_light)
+        theta_light += ang_vel_light * dt;
+
     light[0] = cos(rad * theta_light) * 5;
     light[2] = sin(rad * theta_light) * 5;
 }
