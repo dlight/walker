@@ -17,6 +17,7 @@
 #include "mesh/terrain.h"
 #include "mesh/terrain2.h"
 #include "mesh/terrain3.h"
+#include "mesh/paredes.h"
 
 typedef struct {
     float x;
@@ -257,6 +258,10 @@ void toggle()
     if (key_hit['3']) {
         key_hit['3'] = 0;
         desenhar_terreno = terrain3Draw;
+    }
+    if (key_hit['4']) {
+        key_hit['4'] = 0;
+        desenhar_terreno = paredesDraw;
     }
 }
 
