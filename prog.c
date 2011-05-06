@@ -9,10 +9,8 @@
 #define GL_GLEXT_PROTOTYPES
 
 #ifdef MAC
-#include <OpenGL/gl.h>
 #include <GLUT/glut.h>
 #else
-#include <GL/gl.h>
 #include <GL/glut.h>
 #endif
 
@@ -180,11 +178,9 @@ void event_handler(SDL_Event ev)
             phi = min_phi;
     }
     else if (ev.type == SDL_KEYDOWN) {
-        printf("enabled\n");
         key_pressed[ev.key.keysym.sym] = 1;
     }
     else if (ev.type == SDL_KEYUP) {
-        printf("disabled\n");
         key_pressed[ev.key.keysym.sym] = 0;
     };
 }
@@ -247,13 +243,6 @@ int main(int argc, char *argv[])
 
     putenv("SDL_VIDEO_CENTERED=1");
     SDL_Init(SDL_INIT_VIDEO);
-
-    const SDL_VideoInfo* info = SDL_GetVideoInfo(); 
-
-    if(!(info->hw_available))
-        printf("%d, %d, %d\n", info->hw_available,
-               info->blit_hw,
-               info->blit_sw);
 
     SDL_ShowCursor(SDL_DISABLE);
     SDL_WM_GrabInput(SDL_GRAB_ON);
