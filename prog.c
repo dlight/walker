@@ -7,9 +7,11 @@
 #include "mesh/terreno.h"
 
 #include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
 
-#include <GL/freeglut.h>
+#define GL_GLEXT_PROTOTYPES
+
+#include <GL/gl.h>
+#include <GL/glut.h>
 
 typedef struct {
     float x;
@@ -73,7 +75,9 @@ void draw_fps()
     glLoadIdentity();
     glColor3f(1, 0.4, 0);
     glRasterPos2i(10, 10);
-    glutBitmapString(GLUT_BITMAP_8_BY_13, fps_str);
+
+    for (int i = 0; fps_str[i] != '\0'; i++)
+        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, fps_str[i]);
 }
 
 void setup_projection()

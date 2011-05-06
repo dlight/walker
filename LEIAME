@@ -2,7 +2,6 @@ Programa incompleto. Testado so no linux.
 
 Dependencias:
  * opengl
- * freeglut
  * sdl
 
 Para compilar:
@@ -10,12 +9,11 @@ Para compilar:
 ./configure
 make
 
-Para usar um outro modelo de casa,
-ao inves de ./configure, use:
-
-./configure --casa 2 
-
 Para rodar:
+
+make run
+
+ou
 
 ./bin/prog
 ./bin/prog 1024 758
