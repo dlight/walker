@@ -11,7 +11,7 @@ ifeq ($(PLATFORM), linux)
 			-I ./mesh -o $@ $<
 else
 	gcc -std=c99 `pkg-config --cflags --libs sdl` -DMAC -framework GLUT \
-		-l /opt/local/include -pipe -I ./mesh  -o $@ \
+		-I /opt/local/include -pipe -I ./mesh  -o $@ \
 		$<
 endif
 

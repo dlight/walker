@@ -4,8 +4,6 @@
 
 #include "nanosec.h"
 
-//#include "mesh/terreno.h"
-
 #include <SDL/SDL.h>
 
 #define GL_GLEXT_PROTOTYPES
