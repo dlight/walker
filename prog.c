@@ -21,7 +21,7 @@ typedef struct {
 
 int res_x = 640, res_y = 480;  /* resolucao padrao */
 
-float vel = 4;                 /* velocidade linear */
+float vel = 10;                /* velocidade linear */
 
 float ang_vel = 0.2;           /* velocidade angular */
 
@@ -33,7 +33,12 @@ float min_phi = -90;
 
 vec3 mypos = { .x = 0,        /* posicao do personagem */
                .y = 0,
-               .z = 10 };
+               .z = 15 };
+
+float ang_vel_light = 10;
+float theta_light = 0;
+
+float light[4] = { 0, 5, 0, 0 };
 
 char key_pressed[256];
 
@@ -45,7 +50,7 @@ void cubep(float posx, float posy, float posz)
 {
     glPushMatrix();
     glTranslatef(posx, posy, posz);
-    glutWireCube (1.0);
+    glutSolidCube (1.0);
     glPopMatrix();
 }
 
@@ -67,6 +72,8 @@ void layer(float posz)
 
 void draw_fps()
 {
+    glDisable(GL_LIGHTING);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0, res_x, 0, res_y);
@@ -78,6 +85,8 @@ void draw_fps()
 
     for (int i = 0; fps_str[i] != '\0'; i++)
         glutBitmapCharacter(GLUT_BITMAP_8_BY_13, fps_str[i]);
+
+    glEnable(GL_LIGHTING);
 }
 
 void setup_projection()
@@ -88,6 +97,15 @@ void setup_projection()
                    (GLfloat) res_x /
                    (GLfloat) res_y, 1, 200);
     glMatrixMode (GL_MODELVIEW);
+}
+
+void draw_light_point()
+{
+    glDisable(GL_LIGHTING);
+    glBegin(GL_POINTS);
+    glVertex3f(light[0], light[1], light[2]);
+    glEnd();
+    glEnable(GL_LIGHTING);
 }
 
 void draw()
@@ -102,9 +120,11 @@ void draw()
     glRotatef(theta, 0, -1, 0);
     glTranslatef(-mypos.x, -mypos.y, -mypos.z);
 
-    layer(0);
+    glLightfv(GL_LIGHT0, GL_POSITION, light);
 
-    glScalef(20, 20, 20);
+    draw_light_point();
+
+    layer(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, vboID);
 
@@ -137,7 +157,21 @@ void initgl()
 
     glViewport (0, 0, res_x, res_y); 
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glShadeModel(GL_SMOOTH);
+
+    glPointSize(5.0);
+
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+
+    float lightColor[] = {0.8, 1.0, 0.8, 1.0};
+
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
+    glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.001);
+    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.001);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHTING);
 
     initVBO();
 }
@@ -173,8 +207,9 @@ void event_handler(SDL_Event ev)
 
 void physics(float dt)
 {
-    float vel_sin = vel * sin(M_PI * theta / 180) * dt;
-    float vel_cos = vel * cos(M_PI * theta / 180) * dt;
+    float rad = M_PI / 180;
+    float vel_sin = vel * sin(rad * theta) * dt;
+    float vel_cos = vel * cos(rad * theta) * dt;
 
     if (key_pressed['q']) {
         mypos.y += vel * dt;
@@ -199,6 +234,10 @@ void physics(float dt)
         mypos.x += vel_cos;
         mypos.z -= vel_sin;
     }
+
+    theta_light += ang_vel_light * dt;
+    light[0] = cos(rad * theta_light) * 5;
+    light[2] = sin(rad * theta_light) * 5;
 }
 
 int main(int argc, char *argv[])

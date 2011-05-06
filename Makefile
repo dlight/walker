@@ -6,7 +6,7 @@ conf :
 	./configure
 
 mesh/%.h : mesh/%.obj mesh/%.mtl
-	./tools/obj2opengl.pl $<
+	./tools/obj2opengl.pl -scale 20 $<
 
 bin/prog: prog.c mesh/terreno.h $(subst .obj,.h,$(wildcard mesh/*.obj))
 ifeq ($(PLATFORM), linux)
@@ -26,4 +26,4 @@ fs : bin/prog
 	./bin/prog -fs
 
 clean :
-	rm -f bin/prog mesh/*.h
+	rm -f bin/prog make.platform mesh/*.h
