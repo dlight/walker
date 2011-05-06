@@ -50,8 +50,11 @@ char stop_light = 0;
 
 char key_pressed[256];
 char key_hit[256];
+char hide_text = 0;
 
-char fps_str[8] = "0 FPS";
+char fps_str[8] = "O FPS";
+char status_str[256];
+char status2_str[256];
 
 void cubep(float posx, float posy, float posz)
 {
@@ -77,7 +80,7 @@ void layer(float posz)
 
 
 
-void draw_fps()
+void draw_status()
 {
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
@@ -93,6 +96,16 @@ void draw_fps()
 
     for (int i = 0; fps_str[i] != '\0'; i++)
         glutBitmapCharacter(GLUT_BITMAP_8_BY_13, fps_str[i]);
+
+    glRasterPos2i(10, res_y - 20);
+
+    for (int i = 0; status_str[i] != '\0'; i++)
+        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, status_str[i]);
+
+    glRasterPos2i(10, res_y - 20 - 14);
+
+    for (int i = 0; status2_str[i] != '\0'; i++)
+        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, status2_str[i]);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
@@ -140,7 +153,8 @@ void draw()
 
     terrainDraw();
 
-    draw_fps();
+    if (!hide_text)
+        draw_status();
 
     SDL_GL_SwapBuffers();
 }
@@ -209,6 +223,18 @@ void event_handler(SDL_Event ev)
     };
 }
 
+void toggle()
+{
+    if (key_hit['p']) {
+        key_hit['p'] = 0;
+        stop_light = ! stop_light;
+    }
+    if (key_hit['h']) {
+        key_hit['h'] = 0;
+        hide_text = ! hide_text;
+    }
+}
+
 void physics(float dt)
 {
 
@@ -258,11 +284,6 @@ void physics(float dt)
         light_color[2] += color_vel * dt;
     if (key_pressed['b'])
         light_color[2] -= color_vel * dt;
-
-    if (key_hit['p']) {
-        key_hit['p'] = 0;
-        stop_light = ! stop_light;
-    }
 
     if (!stop_light)
         theta_light += ang_vel_light * dt;
@@ -328,8 +349,8 @@ int main(int argc, char *argv[])
         dt = time_diff(new_time, old_time);
 
         if (new_border > old_border) {
-            printf("fps: %d\n", count);
             snprintf(fps_str, 8, "%d FPS", count);
+            printf("fps: %d\n", count);
             old_border = new_border;
             count = 0;
         }
@@ -337,6 +358,18 @@ int main(int argc, char *argv[])
         old_time = new_time;
         count++;
 
+        snprintf(status_str, 256, "vel %6.3f pos (% 7.3f,% 7.3f,% 7.3f) "
+                 "theta % 8.3f phi % 8.3f",
+                 vel, mypos.x, mypos.y, mypos.z,
+                 theta, phi);
+
+
+        snprintf(status2_str, 256, "luz (% 6.3f,% 6.3f,% 6.3f) "
+                 "cor (% 6.3f, % 6.3f, % 6.3f)",
+                 light[0], light[1], light[2],
+                 light_color[0], light_color[1], light_color[2]);
+
+        toggle();
         physics(dt);
         draw();
     }
