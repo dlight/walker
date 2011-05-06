@@ -22,39 +22,42 @@ typedef struct {
     float z;
 } vec3;
 
-int res_x = 640, res_y = 480;  /* resolucao padrao */
+int res_x = 640, res_y = 480;   /* resolucao padrao */
 
-float vel = 15;                /* velocidade linear */
+float vel = 15;                 /* velocidade linear */
 
-float vel_vel = 10;
+float ang_vel = 0.2;            /* velocidade angular */
 
-float ang_vel = 0.2;           /* velocidade angular */
+float theta = 0;                /* orientacao no plano xz */
+float phi = 0;                  /* orientacao no plano xy */
 
-float theta = 0;               /* orientacao no plano xz */
-float phi = 0;                 /* orientacao no plano xy */
-
-float max_phi = 90;            /* limitacao ao olhar pra cima */
+float max_phi = 90;             /* limitacao ao olhar pra cima */
 float min_phi = -90;
 
-vec3 mypos = { .x = 0,        /* posicao do personagem */
-               .y = 0,
-               .z = 15 };
+vec3 mypos =                    /* posicao do personagem */
+    { .x = 0, .y = 0, .z = 15 };
 
-float ang_vel_light = 10;
-float theta_light = 0;
 
-float light[4] = { 0, 5, 0, 1 };
-float light_color[4] = { 0.8, 1, 0.8, 0 };
-float color_vel = 0.2;
-char stop_light = 0;
+float light[4] =                 /* posicao da luz */
+    { 0, 5, 0, 1 };
+float theta_light = 0;           /* angulo da luz */
+char stop_light = 0;             /* parar luz */
 
-char key_pressed[256];
-char key_hit[256];
-char hide_text = 0;
+float light_color[4] =           /* cor da luz */
+    { 0.8, 1, 0.8, 0 };
 
-char fps_str[8] = "O FPS";
-char status_str[256];
-char status2_str[256];
+float shininess = 128;           /* brilho do material */  
+float diffuse[4]=                /* reflectancia difusa do material */
+    { 0.8, 0.8, 0.8, 1 };
+float specular[4]=               /* reflectancia especular do material */
+    { 0.2, 0.2, 0.2, 1 };
+
+char key_pressed[256];           /* keymap continuo */
+char key_hit[256];               /* keymap toggle */
+
+char fps_str[8] = "O FPS";       /* fps na tela */
+char status_str[2][256];         /* variaveis na tela */
+char hide_text = 0;              /* esconder texto */
 
 void cubep(float posx, float posy, float posz)
 {
@@ -99,13 +102,13 @@ void draw_status()
 
     glRasterPos2i(10, res_y - 20);
 
-    for (int i = 0; status_str[i] != '\0'; i++)
-        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, status_str[i]);
+    for (int i = 0; status_str[0][i] != '\0'; i++)
+        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, status_str[0][i]);
 
     glRasterPos2i(10, res_y - 20 - 14);
 
-    for (int i = 0; status2_str[i] != '\0'; i++)
-        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, status2_str[i]);
+    for (int i = 0; status_str[1][i] != '\0'; i++)
+        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, status_str[1][i]);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
@@ -134,6 +137,9 @@ void draw()
 {
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_color);
     glLightfv(GL_LIGHT0, GL_SPECULAR, light_color);
+    glMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, diffuse);
 
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor3f (1.0, 1.0, 1.0);
@@ -173,10 +179,6 @@ void initgl()
 
     float black[4]={ 0, 0, 0, 0 };
     float white[4]={ 1, 1, 1, 1 };
-    float light_gray[4]={ 0.6, 0.6, 0.6, 0 };
-    float dark_gray[4]={ 0.2, 0.2, 0.2, 0 };
-
-    float shininess = 120;
 
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
 
@@ -186,13 +188,6 @@ void initgl()
     glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.01);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHTING);
-
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT,GL_DIFFUSE);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, white);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, light_gray);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, dark_gray);
-    glMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
 }
 
 void event_handler(SDL_Event ev)
@@ -229,14 +224,22 @@ void toggle()
         key_hit['p'] = 0;
         stop_light = ! stop_light;
     }
-    if (key_hit['h']) {
-        key_hit['h'] = 0;
+    if (key_hit['o']) {
+        key_hit['o'] = 0;
         hide_text = ! hide_text;
     }
 }
 
-void physics(float dt)
+void model(float dt)
 {
+    float vel_vel = 10;
+
+    float color_vel = 0.2;
+    float param_vel = 5;
+    float shin_vel = 50;
+
+    float c = color_vel * dt;
+    float p = param_vel * dt;
 
     if (key_pressed['z'])
         vel += vel_vel * dt;
@@ -244,7 +247,64 @@ void physics(float dt)
     if (key_pressed['c'])
         vel -= vel_vel * dt;
 
+    if (key_pressed['r'])
+        light_color[0] += c;
+    if (key_pressed['t'])
+        light_color[0] -= c;
+    if (key_pressed['f'])
+        light_color[1] += c;
+    if (key_pressed['g'])
+        light_color[1] -= c;
+    if (key_pressed['v'])
+        light_color[2] += c;
+    if (key_pressed['b'])
+        light_color[2] -= c;
+
+
+    if (key_pressed['y']) {
+        diffuse[0] += p;
+        diffuse[1] += p;
+        diffuse[2] += p;
+    }
+    if (key_pressed['u']) {
+        diffuse[0] -= p;
+        if (diffuse[0] < 0)
+            diffuse[0] = 0;
+
+        diffuse[1] = diffuse[0];
+        diffuse[2] = diffuse[0];
+    }
+
+
+    if (key_pressed['h']) {
+        specular[0] += p;
+        specular[1] += p;
+        specular[2] += p;
+    }
+    if (key_pressed['j']) {
+        specular[0] -= p;
+        if (specular[0] < 0)
+            specular[0] = 0;
+        specular[1] = specular[0];
+        specular[2] = specular[0];
+    }
+
+    if (key_pressed['n'])
+        shininess += shin_vel * dt;
+    if (key_pressed['m'])
+        shininess -= shin_vel * dt;
+
+    if (shininess > 128)
+        shininess = 128;
+    else if (shininess < 0)
+        shininess = 0;
+}
+
+void physics(float dt)
+{
     float rad = M_PI / 180;
+    float ang_vel_light = 10;
+
     float vel_sin = vel * sin(rad * theta) * dt;
     float vel_cos = vel * cos(rad * theta) * dt;
 
@@ -271,19 +331,6 @@ void physics(float dt)
         mypos.x += vel_cos;
         mypos.z -= vel_sin;
     }
-
-    if (key_pressed['r'])
-        light_color[0] += color_vel * dt;
-    if (key_pressed['t'])
-        light_color[0] -= color_vel * dt;
-    if (key_pressed['r'])
-        light_color[1] += color_vel * dt;
-    if (key_pressed['g'])
-        light_color[1] -= color_vel * dt;
-    if (key_pressed['v'])
-        light_color[2] += color_vel * dt;
-    if (key_pressed['b'])
-        light_color[2] -= color_vel * dt;
 
     if (!stop_light)
         theta_light += ang_vel_light * dt;
@@ -358,18 +405,20 @@ int main(int argc, char *argv[])
         old_time = new_time;
         count++;
 
-        snprintf(status_str, 256, "vel %6.3f pos (% 7.3f,% 7.3f,% 7.3f) "
-                 "theta % 8.3f phi % 8.3f",
+        snprintf(status_str[0], 256, "vel %6.3f pos (% 7.3f,% 7.3f,% 7.3f) "
+                 "theta % 6.1f phi % 6.1f",
                  vel, mypos.x, mypos.y, mypos.z,
                  theta, phi);
 
 
-        snprintf(status2_str, 256, "luz (% 6.3f,% 6.3f,% 6.3f) "
-                 "cor (% 6.3f, % 6.3f, % 6.3f)",
+        snprintf(status_str[1], 256, "luz (% 6.3f,% 6.3f,% 6.3f) "
+                 "cor (% 6.3f, % 6.3f, % 6.3f) h %.0f s %.2f d %.2f",
                  light[0], light[1], light[2],
-                 light_color[0], light_color[1], light_color[2]);
+                 light_color[0], light_color[1], light_color[2],
+                 shininess, specular[0], diffuse[0]);
 
         toggle();
+        model(dt);
         physics(dt);
         draw();
     }
