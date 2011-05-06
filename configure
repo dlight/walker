@@ -1,15 +1,2 @@
 #!/bin/bash
-
-if [[ $1 == '--os' ]]; then
-    os=$2
-    shift
-    shift
-else
-    if sw_vers 2> /dev/null; then
-        os=mac
-    else
-        os=linux
-    fi
-fi
-
-echo PLATFORM = $os > make.platform
+echo PLATFORM = $(uname -s) > make.platform
