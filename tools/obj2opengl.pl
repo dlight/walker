@@ -169,6 +169,7 @@ sub handleArguments() {
     unless($errorInOptions || defined($outFilename)) {
         my ($file, $dir, $ext) = fileparse($inFilename, qr/\.[^.]*/);
         $outFilename = $dir . $file . ".h";
+        $outFilename_c = $dir . $file . ".c";
     }
     
     # (optional) define object name from output filename
@@ -298,7 +299,8 @@ sub calcSizeAndCenter() {
 
 sub printInputAndOptions() {
 	print "Input file     : $inFilename\n";
-	print "Output file    : $outFilename\n";
+	print "Output header  : $outFilename\n";
+	print "Output source  : $outFilename_c\n";
 	print "Object name    : $object\n";
 	print "Center         : <$xcen, $ycen, $zcen>\n";
 	print "Scale by       : $scalefac\n";
@@ -429,6 +431,9 @@ sub normalizeNormals {
 sub writeOutput {
 	open ( OUTFILE, ">$outFilename" ) 
 	  || die "Can't create file $outFilename ... exiting\n";
+
+	open ( OUTFILE_C, ">$outFilename_c" ) 
+	  || die "Can't create file $outFilename_c ... exiting\n";
 	
 	print OUTFILE "/*\n";
 	print OUTFILE "created with obj2opengl.pl\n\n";
@@ -453,59 +458,65 @@ sub writeOutput {
 	print OUTFILE "// draw data\n";
 	print OUTFILE "glDrawArrays(GL_TRIANGLES, 0, ".$object."NumVerts);\n";
 	print OUTFILE "*/\n\n";
-	
-	print OUTFILE "#pragma once\n\n";
 
         print OUTFILE "typedef struct {\n";
-        print OUTFILE "  GLfloat vertex[3];\n";
-        print OUTFILE "  GLfloat normal[3];\n" if $numNormals > 0;
-        print OUTFILE "  GLfloat texcoord[2];\n" if $numTexture > 0;
+        print OUTFILE "  float vertex[3];\n";
+        print OUTFILE "  float normal[3];\n" if $numNormals > 0;
+        print OUTFILE "  float texcoord[2];\n" if $numTexture > 0;
         print OUTFILE "} ".$object."Data_t;\n\n";
 
-        print OUTFILE "static const ".$object."Data_t ".$object."Data[] = {\n";
-	for($j = 0; $j < $numFaces; $j++){
-		print OUTFILE "  // $face_line[$j]\n";
+        print OUTFILE_C "typedef struct {\n";
+        print OUTFILE_C "  float vertex[3];\n";
+        print OUTFILE_C "  float normal[3];\n" if $numNormals > 0;
+        print OUTFILE_C "  float texcoord[2];\n" if $numTexture > 0;
+        print OUTFILE_C "} ".$object."Data_t;\n\n";
 
-                print OUTFILE "{\n";
+        print OUTFILE "extern ".$object."Data_t ".$object."Data[];\n\n";
+
+        print OUTFILE_C $object."Data_t ".$object."Data[] = {\n";
+	for($j = 0; $j < $numFaces; $j++){
+		print OUTFILE_C "  // $face_line[$j]\n";
+
+                print OUTFILE_C "{\n";
 		$iva = $va_idx[$j];
-                printf OUTFILE "  {%ef, %ef, %ef},\n", $xcoords[$iva], $ycoords[$iva], $zcoords[$iva];
+                printf OUTFILE_C "  {%ef, %ef, %ef},\n", $xcoords[$iva], $ycoords[$iva], $zcoords[$iva];
                 if($numNormals > 0) {
                     $ina = $na_idx[$j];
-                    printf OUTFILE "  {%ef, %ef, %ef},\n", $nx[$ina], $ny[$ina], $nz[$ina];
+                    printf OUTFILE_C "  {%ef, %ef, %ef},\n", $nx[$ina], $ny[$ina], $nz[$ina];
                 }
                 if($numTexture) {
                     $ita = $ta_idx[$j];
-                    printf OUTFILE "  {%ef, %ef},\n", $tx[$ita], $ty[$ita];
+                    printf OUTFILE_C "  {%ef, %ef},\n", $tx[$ita], $ty[$ita];
                 }
-                print OUTFILE "},\n";
+                print OUTFILE_C "},\n";
 
-                print OUTFILE "{\n";
+                print OUTFILE_C "{\n";
 		$ivb = $vb_idx[$j];
-                printf OUTFILE "  {%ef, %ef, %ef},\n", $xcoords[$ivb], $ycoords[$ivb], $zcoords[$ivb];
+                printf OUTFILE_C "  {%ef, %ef, %ef},\n", $xcoords[$ivb], $ycoords[$ivb], $zcoords[$ivb];
                 if($numNormals > 0) {
                     $inb = $nb_idx[$j];
-                    printf OUTFILE "  {%ef, %ef, %ef},\n", $nx[$inb], $ny[$inb], $nz[$inb];
+                    printf OUTFILE_C "  {%ef, %ef, %ef},\n", $nx[$inb], $ny[$inb], $nz[$inb];
                 }
                 if($numTexture) {
                     $itb = $tb_idx[$j];
-                    printf OUTFILE "  {%ef, %ef},\n", $tx[$itb], $ty[$itb];
+                    printf OUTFILE_C "  {%ef, %ef},\n", $tx[$itb], $ty[$itb];
                 }
-                print OUTFILE "},\n";
+                print OUTFILE_C "},\n";
 
-                print OUTFILE "{\n";
+                print OUTFILE_C "{\n";
 		$ivc = $vc_idx[$j];
-                printf OUTFILE "  {%ef, %ef, %ef},\n", $xcoords[$ivc], $ycoords[$ivc], $zcoords[$ivc];
+                printf OUTFILE_C "  {%ef, %ef, %ef},\n", $xcoords[$ivc], $ycoords[$ivc], $zcoords[$ivc];
                 if($numNormals > 0) {
                     $inc = $nc_idx[$j];
-                    printf OUTFILE "  {%ef, %ef, %ef},\n", $nx[$inc], $ny[$inc], $nz[$inc];
+                    printf OUTFILE_C "  {%ef, %ef, %ef},\n", $nx[$inc], $ny[$inc], $nz[$inc];
                 }
                 if($numTexture) {
                     $itc = $tc_idx[$j];
-                    printf OUTFILE "  {%ef, %ef},\n", $tx[$itc], $ty[$itc];
+                    printf OUTFILE_C "  {%ef, %ef},\n", $tx[$itc], $ty[$itc];
                 }
-                print OUTFILE "},\n";
+                print OUTFILE_C "},\n";
         }
-        print OUTFILE "};\n\n";
+        print OUTFILE_C "};\n\n";
 
 	### Needed constants for glDrawArrays
 
@@ -513,9 +524,9 @@ sub writeOutput {
 
         print OUTFILE "static const GLsizei ".$object."Stride = sizeof(".$object."Data_t);\n\n";
 
-        print OUTFILE "static const GLfloat *".$object."Verts = ".$object."Data[0].vertex;\n";
-        print OUTFILE "static const GLfloat *".$object."Normals = ".$object."Data[0].normal;\n" if $numNormals > 0;
-        print OUTFILE "static const GLfloat *".$object."TexCoords = ".$object."Data[0].texcoord;\n" if $numTexture > 0;
+        print OUTFILE "static const float *".$object."Verts = ".$object."Data[0].vertex;\n";
+        print OUTFILE "static const float *".$object."Normals = ".$object."Data[0].normal;\n" if $numNormals > 0;
+        print OUTFILE "static const float *".$object."TexCoords = ".$object."Data[0].texcoord;\n" if $numTexture > 0;
         print OUTFILE "\n";
 
         print OUTFILE "static void ".$object."Draw(void){\n";
