@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include <time.h>
+#include "nanosec.h"
 
 #include "mesh/terreno.h"
 
@@ -38,15 +38,6 @@ char key_pressed[256];
 char fps_str[8] = "0 FPS";
 
 GLuint vboID;
-
-float timespec_diff(struct timespec end,
-                              struct timespec start)
-{
-    float nsec = end.tv_nsec - start.tv_nsec;
-
-    return (end.tv_sec - start.tv_sec) +
-        nsec / 1000000000;
-}
 
 void cubep(float posx, float posy, float posz)
 {
@@ -244,9 +235,10 @@ int main(int argc, char *argv[])
         else
             event_handler(ev);
 
-    struct timespec old_time, new_time;
-
-    clock_gettime(CLOCK_MONOTONIC, &old_time);
+    uint64_t old_time, new_time;
+    uint64_t old_border, new_border;
+    old_time = time_get();
+    old_border = time_in_secs(old_time);
 
     float dt = 0;
     int count = 0;
@@ -255,12 +247,15 @@ int main(int argc, char *argv[])
         while (SDL_PollEvent(&ev))
             event_handler(ev);
 
-        clock_gettime(CLOCK_MONOTONIC, &new_time);
-        dt = timespec_diff(new_time, old_time);
+        new_time = time_get();
+        new_border = time_in_secs(new_time);
 
-        if (new_time.tv_sec > old_time.tv_sec) {
+        dt = time_diff(new_time, old_time);
+
+        if (new_border > old_border) {
             printf("fps: %d\n", count);
             snprintf(fps_str, 8, "%d FPS", count);
+            old_border = new_border;
             count = 0;
         }
 
