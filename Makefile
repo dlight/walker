@@ -1,5 +1,3 @@
-include make.platform
-
 .PRECIOUS: mesh/%.c
 
 OBJ = $(subst .obj,.o,$(wildcard mesh/*.obj))
@@ -14,29 +12,17 @@ all : bin/prog
 mesh/%.c mesh/%.h : mesh/%.obj mesh/%.mtl
 	./tools/obj2opengl.pl -scale 20 $<
 
-<<<<<<< HEAD
 mesh/%.o : mesh/%.c
 	$(CC) -c -o $@ $<
 
 bin/prog: prog.c nanosec.h $(OBJ) $(HEADER)
-ifeq ($(PLATFORM), linux)
-	$(CC) $(CFLAGS) `pkg-config --cflags --libs sdl gl glu` -lglut \
-			$(OBJ) $< -o $@
-else ifeq ($(PLATFORM), mac)
-	$(CC) $(CFLAGS) -DMAC `pkg-config --cflags --libs sdl` \
-	-framework GLUT -I /opt/local/include \
-			$(OBJ) $< -o $@
-=======
-bin/prog: prog.c nanosec.h $(subst .obj,.h,$(wildcard mesh/*.obj))
-ifeq ($(PLATFORM), Linux)
-	gcc -std=c99 `pkg-config --cflags --libs sdl gl glu` -lglut -pipe \
-			-I ./mesh -o $@ $<
-else
-	gcc -std=c99 `pkg-config --cflags --libs sdl` -DMAC -framework GLUT \
-		-I /opt/local/include -pipe -I ./mesh  -o $@ \
-		$<
->>>>>>> FETCH_HEAD
-endif
+	if [[ $$(uname -s) -eq Linux ]]; then \
+		$(CC) $(CFLAGS) `pkg-config --cflags --libs sdl gl glu` \
+			-lglut $(OBJ) $< -o $@; \
+	elif [[ $$(uname -s) -eq Darwin ]]; then \
+		$(CC) $(CFLAGS) -DMAC `pkg-config --cflags --libs sdl` \
+		-framework GLUT -I /opt/local/include $(OBJ) $< -o $@; \
+	fi
 
 
 run : bin/prog
