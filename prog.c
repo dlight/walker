@@ -10,8 +10,13 @@
 
 #define GL_GLEXT_PROTOTYPES
 
+#ifdef MAC
+#include <OpenGL/gl.h>
+#include <GLUT/glut.h>
+#else
 #include <GL/gl.h>
 #include <GL/glut.h>
+#endif
 
 #include "mesh/terrain.h"
 
