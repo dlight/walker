@@ -10,10 +10,10 @@ mesh/%.h : mesh/%.obj mesh/%.mtl
 
 bin/prog: prog.c mesh/casa.h $(subst .obj,.h,$(wildcard mesh/*.obj))
 ifeq ($(PLATFORM), linux)
-	gcc `pkg-config --cflags --libs sdl gl glu` -lglut -pipe \
+	gcc -std=c99 `pkg-config --cflags --libs sdl gl glu` -lglut -pipe \
 			-I ./mesh -o $@ $<
 else
-	gcc `pkg-config --cflags --libs sdl` -framework GLUT \
+	gcc -std=c99 `pkg-config --cflags --libs sdl` -framework GLUT \
 		-l /opt/local/include -pipe -I ./mesh  -o $@ \
 		$<
 endif

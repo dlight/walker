@@ -11,21 +11,27 @@
 
 #include <GL/freeglut.h>
 
+typedef struct {
+    float x;
+    float y;
+    float z;
+} vec3;
+
 int res_x = 640, res_y = 480;  /* resolucao padrao */
 
-float vel = 4;           /* velocidade linear */
+float vel = 4;                 /* velocidade linear */
 
-float ang_vel = 0.2;  /* velocidade angular */
+float ang_vel = 0.2;           /* velocidade angular */
 
 float theta = 0;               /* orientacao no plano xz */
 float phi = 0;                 /* orientacao no plano xy */
 
-float max_phi = 45;            /* limitacao ao olhar pra cima */
-float min_phi = -45;
+float max_phi = 90;            /* limitacao ao olhar pra cima */
+float min_phi = -90;
 
-float pos_x = 0;               /* posicao inicial */ 
-float pos_y = 0;
-float pos_z = 10;
+vec3 mypos = { .x = 0,        /* posicao do personagem */
+               .y = 0,
+               .z = 10 };
 
 char key_pressed[256];
 
@@ -99,7 +105,7 @@ void draw()
 
     glRotatef(phi, -1, 0, 0);
     glRotatef(theta, 0, -1, 0);
-    glTranslatef(-pos_x, -pos_y, -pos_z);
+    glTranslatef(-mypos.x, -mypos.y, -mypos.z);
 
     layer(0);
 
@@ -176,27 +182,27 @@ void physics(float dt)
     float vel_cos = vel * cos(M_PI * theta / 180) * dt;
 
     if (key_pressed['q']) {
-        pos_y += vel * dt;
+        mypos.y += vel * dt;
     }
     if (key_pressed['e']) {
-        pos_y -= vel * dt;
+        mypos.y -= vel * dt;
     }
 
     if (key_pressed['w']) {
-        pos_x -= vel_sin;
-        pos_z -= vel_cos;
+        mypos.x -= vel_sin;
+        mypos.z -= vel_cos;
     }
     if (key_pressed['s']) {
-        pos_x += vel_sin;
-        pos_z += vel_cos;
+        mypos.x += vel_sin;
+        mypos.z += vel_cos;
     }
     if (key_pressed['a']) {
-        pos_x -= vel_cos;
-        pos_z += vel_sin;
+        mypos.x -= vel_cos;
+        mypos.z += vel_sin;
     }
     if (key_pressed['d']) {
-        pos_x += vel_cos;
-        pos_z -= vel_sin;
+        mypos.x += vel_cos;
+        mypos.z -= vel_sin;
     }
 }
 
