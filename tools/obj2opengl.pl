@@ -1,45 +1,46 @@
 #! /usr/bin/perl
 =head1 NAME
 
- obj2opengl - converts obj files to arrays for glDrawArrays
- 
+    obj2opengl - converts obj files to arrays for glDrawArrays
+    
 =head1 SYNOPSIS
 
- obj2opengl [options] file
+    obj2opengl [options] file
 
- use -help or -man for further information
+    use -help or -man for further information
 
 =head1 DESCRIPTION
 
-This script expects and OBJ file consisting of vertices,
-texture coords and normals. Each face must contain
-exactly 3 vertices. The texture coords are two dimonsional.
+    This script expects and OBJ file consisting of vertices,
+    texture coords and normals. Each face must contain
+    exactly 3 vertices. The texture coords are two dimonsional.
 
-The resulting .H file offers three float arrays to be rendered
-with glDrawArrays.
+    The resulting .H file offers three float arrays to be rendered
+    with glDrawArrays.
 
 =head1 AUTHOR
 
-Heiko Behrens (http://www.HeikoBehrens.net)
+    Heiko Behrens (http://www.1160pm.net)
 
 =head1 VERSION
 
-25th August 2009 (initial version)
+    4th February 2010 (interleaved data, *Stride, and *Draw - Mirza Garibovic)
+    25th August 2009 (initial version)
 
 =head1 COPYRIGHT
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -126,70 +127,70 @@ writeOutput();
 # -----------------------------------------------------------------
 
 sub handleArguments() {
-	my $help = 0;
-	my $man = 0;
-	my $noscale = 0;
-	my $nomove = 0;
-	$verbose = 1;
-	$errorInOptions = !GetOptions (
-		"help" => \$help,
-		"man"  => \$man,
-		"noScale" => \$noscale,
-		"scale=f" => \$scalefac,
-		"noMove" => \$nomove,
-		"center=f{3}" => \@center,
-		"outputFilename=s" => \$outFilename,
-		"nameOfObject=s" => \$object,
-		"verbose!" => \$verbose,
-		);
-	
-	if($noscale) {
-		$scalefac = 1;
-	}
-	
-	if($nomove) {
-		@center = (0, 0, 0);
-	}
-	
-	if(defined(@center)) {
-		$xcen = $center[0];
-		$ycen = $center[1];
-		$zcen = $center[2];
-	}
-	
-	if($#ARGV == 0) {
-		my ($file, $dir, $ext) = fileparse($ARGV[0], qr/\.[^.]*/);
-		$inFilename = $dir . $file . $ext;
-	} else {
-		$errorInOptions = true;
-	}
+    my $help = 0;
+    my $man = 0;
+    my $noscale = 0;
+    my $nomove = 0;
+    $verbose = 1;
+    $errorInOptions = !GetOptions (
+        "help" => \$help,
+        "man"  => \$man,
+        "noScale" => \$noscale,
+        "scale=f" => \$scalefac,
+        "noMove" => \$nomove,
+        "center=f{3}" => \@center,
+        "outputFilename=s" => \$outFilename,
+        "nameOfObject=s" => \$object,
+        "verbose!" => \$verbose,
+        );
+    
+    if($noscale) {
+        $scalefac = 1;
+    }
+    
+    if($nomove) {
+        @center = (0, 0, 0);
+    }
+    
+    if(defined(@center)) {
+        $xcen = $center[0];
+        $ycen = $center[1];
+        $zcen = $center[2];
+    }
+    
+    if($#ARGV == 0) {
+        my ($file, $dir, $ext) = fileparse($ARGV[0], qr/\.[^.]*/);
+        $inFilename = $dir . $file . $ext;
+    } else {
+        $errorInOptions = true;
+    }
 
-	# (optional) derive output filename from input filename
-	unless($errorInOptions || defined($outFilename)) {
-		my ($file, $dir, $ext) = fileparse($inFilename, qr/\.[^.]*/);
-		$outFilename = $dir . $file . ".h";
-	}
-	
-	# (optional) define object name from output filename
-	unless($errorInOptions || defined($object)) {
-		my ($file, $dir, $ext) = fileparse($outFilename, qr/\.[^.]*/);
-	  	$object = $file;
-	}
-	
-	($inFilename ne $outFilename) or
-		die ("Input filename must not be the same as output filename")
-		unless($errorInOptions);
-		
-	if($errorInOptions || $man || $help) {
-		pod2usage(-verbose => 2) if $man;
-		pod2usage(-verbose => 1) if $help;
-		pod2usage(); 
-	}
-	
-	# check wheter file exists
-	open ( INFILE, "<$inFilename" ) 
-	  || die "Can't find file '$inFilename' ...exiting \n";
-	close(INFILE);
+    # (optional) derive output filename from input filename
+    unless($errorInOptions || defined($outFilename)) {
+        my ($file, $dir, $ext) = fileparse($inFilename, qr/\.[^.]*/);
+        $outFilename = $dir . $file . ".h";
+    }
+    
+    # (optional) define object name from output filename
+    unless($errorInOptions || defined($object)) {
+        my ($file, $dir, $ext) = fileparse($outFilename, qr/\.[^.]*/);
+        $object = $file;
+    }
+    
+    ($inFilename ne $outFilename) or
+        die ("Input filename must not be the same as output filename")
+        unless($errorInOptions);
+    
+    if($errorInOptions || $man || $help) {
+        pod2usage(-verbose => 2) if $man;
+        pod2usage(-verbose => 1) if $help;
+        pod2usage(); 
+    }
+    
+    # check wheter file exists
+    open ( INFILE, "<$inFilename" ) 
+        || die "Can't find file '$inFilename' ...exiting \n";
+    close(INFILE);
 }
 
 # Stores center of object in $xcen, $ycen, $zcen
@@ -442,67 +443,98 @@ sub writeOutput {
 	
 	# example usage
 	print OUTFILE "// include generated arrays\n";
-	print OUTFILE "#import \"".$outFilename."\"\n";
+	print OUTFILE "#include \"".$outFilename."\"\n";
 	print OUTFILE "\n";
 	print OUTFILE "// set input data to arrays\n";
-	print OUTFILE "glVertexPointer(3, GL_FLOAT, 0, ".$object."Verts);\n";
-	print OUTFILE "glNormalPointer(GL_FLOAT, 0, ".$object."Normals);\n"
-		if $numNormals > 0;
-	print OUTFILE "glTexCoordPointer(2, GL_FLOAT, 0, ".$object."TexCoords);\n"
-		if $numTexture > 0;
+	print OUTFILE "glVertexPointer(3, GL_FLOAT, ".$object."Stride, ".$object."Verts);\n";
+	print OUTFILE "glNormalPointer(GL_FLOAT, ".$object."Stride, ".$object."Normals);\n" if $numNormals > 0;
+	print OUTFILE "glTexCoordPointer(2, GL_FLOAT, ".$object."Stride, ".$object."TexCoords);\n" if $numTexture > 0;
 	print OUTFILE "\n";
 	print OUTFILE "// draw data\n";
 	print OUTFILE "glDrawArrays(GL_TRIANGLES, 0, ".$object."NumVerts);\n";
 	print OUTFILE "*/\n\n";
 	
-	# needed constant for glDrawArrays
-	print OUTFILE "unsigned int ".$object."NumVerts = ".($numFaces * 3).";\n\n";
-	
-	# write verts
-	print OUTFILE "float ".$object."Verts \[\] = {\n"; 
-	for( $j = 0; $j < $numFaces; $j++)
-	{
-		$ia = $va_idx[$j];
-		$ib = $vb_idx[$j];
-		$ic = $vc_idx[$j];
+	print OUTFILE "#pragma once\n\n";
+
+        print OUTFILE "typedef struct {\n";
+        print OUTFILE "  GLfloat vertex[3];\n";
+        print OUTFILE "  GLfloat normal[3];\n" if $numNormals > 0;
+        print OUTFILE "  GLfloat texcoord[2];\n" if $numTexture > 0;
+        print OUTFILE "} ".$object."Data_t;\n\n";
+
+        print OUTFILE "static const ".$object."Data_t ".$object."Data[] = {\n";
+	for($j = 0; $j < $numFaces; $j++){
 		print OUTFILE "  // $face_line[$j]\n";
-		print OUTFILE "  $xcoords[$ia], $ycoords[$ia], $zcoords[$ia],\n";
-		print OUTFILE "  $xcoords[$ib], $ycoords[$ib], $zcoords[$ib],\n";
-		print OUTFILE "  $xcoords[$ic], $ycoords[$ic], $zcoords[$ic],\n";
-	}
-	print OUTFILE "};\n\n";
-	
-	# write normals
-	if($numNormals > 0) {
-		print OUTFILE "float ".$object."Normals \[\] = {\n"; 
-		for( $j = 0; $j < $numFaces; $j++) {
-			$ia = $na_idx[$j];
-			$ib = $nb_idx[$j];
-			$ic = $nc_idx[$j];
-			print OUTFILE "  // $face_line[$j]\n";
-			print OUTFILE "  $nx[$ia], $ny[$ia], $nz[$ia],\n";
-			print OUTFILE "  $nx[$ib], $ny[$ib], $nz[$ib],\n";
-			print OUTFILE "  $nx[$ic], $ny[$ic], $nz[$ic],\n";
-		}
-		
-		print OUTFILE "};\n\n";
-	}
-	
-	# write texture coords
-	if($numTexture) {
-		print OUTFILE "float ".$object."TexCoords \[\] = {\n"; 
-		for( $j = 0; $j < $numFaces; $j++) {
-			$ia = $ta_idx[$j];
-			$ib = $tb_idx[$j];
-			$ic = $tc_idx[$j];
-			print OUTFILE "  // $face_line[$j]\n";
-			print OUTFILE "  $tx[$ia], $ty[$ia],\n";
-			print OUTFILE "  $tx[$ib], $ty[$ib],\n";
-			print OUTFILE "  $tx[$ic], $ty[$ic],\n";
-		}
-		
-		print OUTFILE "};\n\n";
-	}
+
+                print OUTFILE "{\n";
+		$iva = $va_idx[$j];
+                printf OUTFILE "  {%ef, %ef, %ef},\n", $xcoords[$iva], $ycoords[$iva], $zcoords[$iva];
+                if($numNormals > 0) {
+                    $ina = $na_idx[$j];
+                    printf OUTFILE "  {%ef, %ef, %ef},\n", $nx[$ina], $ny[$ina], $nz[$ina];
+                }
+                if($numTexture) {
+                    $ita = $ta_idx[$j];
+                    printf OUTFILE "  {%ef, %ef},\n", $tx[$ita], $ty[$ita];
+                }
+                print OUTFILE "},\n";
+
+                print OUTFILE "{\n";
+		$ivb = $vb_idx[$j];
+                printf OUTFILE "  {%ef, %ef, %ef},\n", $xcoords[$ivb], $ycoords[$ivb], $zcoords[$ivb];
+                if($numNormals > 0) {
+                    $inb = $nb_idx[$j];
+                    printf OUTFILE "  {%ef, %ef, %ef},\n", $nx[$inb], $ny[$inb], $nz[$inb];
+                }
+                if($numTexture) {
+                    $itb = $tb_idx[$j];
+                    printf OUTFILE "  {%ef, %ef},\n", $tx[$itb], $ty[$itb];
+                }
+                print OUTFILE "},\n";
+
+                print OUTFILE "{\n";
+		$ivc = $vc_idx[$j];
+                printf OUTFILE "  {%ef, %ef, %ef},\n", $xcoords[$ivc], $ycoords[$ivc], $zcoords[$ivc];
+                if($numNormals > 0) {
+                    $inc = $nc_idx[$j];
+                    printf OUTFILE "  {%ef, %ef, %ef},\n", $nx[$inc], $ny[$inc], $nz[$inc];
+                }
+                if($numTexture) {
+                    $itc = $tc_idx[$j];
+                    printf OUTFILE "  {%ef, %ef},\n", $tx[$itc], $ty[$itc];
+                }
+                print OUTFILE "},\n";
+        }
+        print OUTFILE "};\n\n";
+
+	### Needed constants for glDrawArrays
+
+	print OUTFILE "static const GLsizei ".$object."NumVerts = ".($numFaces * 3).";\n\n";
+
+        print OUTFILE "static const GLsizei ".$object."Stride = sizeof(".$object."Data_t);\n\n";
+
+        print OUTFILE "static const GLfloat *".$object."Verts = ".$object."Data[0].vertex;\n";
+        print OUTFILE "static const GLfloat *".$object."Normals = ".$object."Data[0].normal;\n" if $numNormals > 0;
+        print OUTFILE "static const GLfloat *".$object."TexCoords = ".$object."Data[0].texcoord;\n" if $numTexture > 0;
+        print OUTFILE "\n";
+
+        print OUTFILE "static void ".$object."Draw(void){\n";
+
+        print OUTFILE "  glEnableClientState(GL_VERTEX_ARRAY);\n";
+        print OUTFILE "  glEnableClientState(GL_NORMAL_ARRAY);\n" if $numNormals > 0;
+        print OUTFILE "  glEnableClientState(GL_TEXTURE_COORD_ARRAY);\n" if $numTexture > 0;
+
+        print OUTFILE "  glVertexPointer(3, GL_FLOAT, ".$object."Stride, ".$object."Verts);\n";
+        print OUTFILE "  glNormalPointer(GL_FLOAT, ".$object."Stride, ".$object."Normals);\n" if $numNormals > 0;
+        print OUTFILE "  glTexCoordPointer(2, GL_FLOAT, ".$object."Stride, ".$object."TexCoords);\n" if $numTexture > 0;
+        
+        print OUTFILE "  glDrawArrays(GL_TRIANGLES, 0, ".$object."NumVerts);\n";
+        
+        print OUTFILE "  glDisableClientState(GL_TEXTURE_COORD_ARRAY);\n" if $numTexture > 0;
+        print OUTFILE "  glDisableClientState(GL_NORMAL_ARRAY);\n" if $numNormals > 0;
+        print OUTFILE "  glDisableClientState(GL_VERTEX_ARRAY);\n";
+
+        print OUTFILE "}\n";
 	
 	close OUTFILE;
 }

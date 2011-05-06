@@ -1,7 +1,5 @@
 #!/bin/bash
 
-casa=casa1
-
 if [[ $1 == '--os' ]]; then
     os=$2
     shift
@@ -14,21 +12,4 @@ else
     fi
 fi
 
-if [[ $1 = '--terreno' ]]; then
-    terreno=$2
-else
-    terreno=terrain
-fi
-
 echo PLATFORM = $os > make.platform
-
-genh() {
-cat <<tac
-#include "$1.h"
-
-#define terrenoNumVerts ${1}NumVerts
-#define terrenoVerts ${1}Verts
-tac
-}
-
-genh $terreno > mesh/terreno.h

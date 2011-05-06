@@ -4,7 +4,7 @@
 
 #include "nanosec.h"
 
-#include "mesh/terreno.h"
+//#include "mesh/terreno.h"
 
 #include <SDL/SDL.h>
 
@@ -12,6 +12,8 @@
 
 #include <GL/gl.h>
 #include <GL/glut.h>
+
+#include "mesh/terrain.h"
 
 typedef struct {
     float x;
@@ -44,8 +46,6 @@ char key_pressed[256];
 
 char fps_str[8] = "0 FPS";
 
-GLuint vboID;
-
 void cubep(float posx, float posy, float posz)
 {
     glPushMatrix();
@@ -73,6 +73,7 @@ void layer(float posz)
 void draw_fps()
 {
     glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -86,6 +87,7 @@ void draw_fps()
     for (int i = 0; fps_str[i] != '\0'; i++)
         glutBitmapCharacter(GLUT_BITMAP_8_BY_13, fps_str[i]);
 
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
 }
 
@@ -126,31 +128,12 @@ void draw()
 
     layer(0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vboID);
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, 0);
-    glDrawArrays(GL_TRIANGLES, 0, terrenoNumVerts);
-    glDisableClientState(GL_VERTEX_ARRAY);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    terrainDraw();
 
     draw_fps();
 
     SDL_GL_SwapBuffers();
 }
-
-void initVBO()
-{
-    glGenBuffers(1, &vboID);
-    glBindBuffer(GL_ARRAY_BUFFER, vboID);
-    glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(float) * terrenoNumVerts,
-                 terrenoVerts,
-                 GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
 void initgl()
 {
     glClearColor (0.0, 0.0, 0.0, 0.0);
@@ -172,8 +155,6 @@ void initgl()
     glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.001);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHTING);
-
-    initVBO();
 }
 
 void event_handler(SDL_Event ev)
