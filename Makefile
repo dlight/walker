@@ -16,10 +16,10 @@ mesh/%.o : mesh/%.c
 	$(CC) -c -o $@ $<
 
 bin/prog: prog.c nanosec.h $(OBJ) $(HEADER)
-	if [[ $$(uname -s) -eq Linux ]]; then \
+	if [[ $$(uname -s) = Linux ]]; then \
 		$(CC) $(CFLAGS) `pkg-config --cflags --libs sdl gl glu` \
 			-lglut $(OBJ) $< -o $@; \
-	elif [[ $$(uname -s) -eq Darwin ]]; then \
+	elif [[ $$(uname -s) = Darwin ]]; then \
 		$(CC) $(CFLAGS) -DMAC `pkg-config --cflags --libs sdl` \
 		-framework GLUT -I /opt/local/include $(OBJ) $< -o $@; \
 	fi
