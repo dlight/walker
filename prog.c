@@ -60,7 +60,11 @@ char key_hit[256];               /* keymap toggle */
 
 char fps_str[8] = "O FPS";       /* fps na tela */
 char status_str[2][256];         /* variaveis na tela */
+
 char hide_text = 0;              /* esconder texto */
+char grab = 1;
+
+GLuint mapa;
 
 void (*desenhar_terreno)(void) = terrainDraw;
 
@@ -199,13 +203,23 @@ void event_handler(SDL_Event ev)
 {
     if (ev.type == SDL_QUIT ||
         (ev.type == SDL_KEYDOWN &&
-         ev.key.keysym.sym == SDLK_ESCAPE)) {
+         //(ev.key.keysym.sym == SDLK_ESCAPE ||
+          (ev.key.keysym.mod == KMOD_LALT &&
+           ev.key.keysym.sym == SDLK_F4))) {
 
         SDL_Quit();
         exit(0);
     }
 
-    if (ev.type == SDL_MOUSEMOTION) {
+    if (ev.type == SDL_MOUSEBUTTONDOWN &&
+        ev.button.button == SDL_BUTTON_LEFT &&
+        !grab) {
+            SDL_WM_GrabInput(SDL_GRAB_ON);
+            SDL_ShowCursor(SDL_DISABLE);
+            grab = 1;
+    }
+
+    if (ev.type == SDL_MOUSEMOTION && grab) {
         theta -= ev.motion.xrel * ang_vel;
         phi -= ev.motion.yrel * ang_vel;
 
@@ -225,6 +239,13 @@ void event_handler(SDL_Event ev)
 
 void toggle()
 {
+    if (key_hit[SDLK_ESCAPE]) {
+        key_hit[SDLK_ESCAPE] = 0;
+            SDL_WM_GrabInput(SDL_GRAB_OFF);
+            SDL_ShowCursor(SDL_ENABLE);
+            grab = 0;
+    }
+
     if (key_hit['p']) {
         key_hit['p'] = 0;
         stop_light = ! stop_light;
