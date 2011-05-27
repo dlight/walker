@@ -1,6 +1,5 @@
-/bin
 /mesh/*.h
 /mesh/*.c
-/make.platform
 
+walker
 *.o

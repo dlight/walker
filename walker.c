@@ -1,12 +1,13 @@
+#define GL_GLEXT_PROTOTYPES
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 
+#include "param.h"
 #include "nanosec.h"
 
 #include <SDL/SDL.h>
-
-#define GL_GLEXT_PROTOTYPES
 
 #ifdef MAC
 #include <GLUT/glut.h>
@@ -18,55 +19,10 @@
 #include "mesh/terrain2.h"
 #include "mesh/terrain3.h"
 #include "mesh/paredes.h"
+#include "mesh/terrenoecasa.h"
+#include "mesh/terrenoecasa2.h"
 
-typedef struct {
-    float x;
-    float y;
-    float z;
-} vec3;
-
-int res_x = 640, res_y = 480;   /* resolucao padrao */
-
-float vel = 15;                 /* velocidade linear */
-
-float ang_vel = 0.2;            /* velocidade angular */
-
-float theta = -93;               /* orientacao no plano xz */
-float phi = 0;                  /* orientacao no plano xy */
-
-float max_phi = 90;             /* limitacao ao olhar pra cima */
-float min_phi = -90;
-
-vec3 mypos =                    /* posicao do personagem */
-    { .x = -10, .y = 0, .z = 4 };
-
-
-float light[4] =                 /* posicao da luz */
-    { 0, 5, 0, 1 };
-float theta_light = 0;           /* angulo da luz */
-char stop_light = 0;             /* parar luz */
-
-float light_color[4] =           /* cor da luz */
-    { 0.8, 1, 0.8, 0 };
-
-float shininess = 128;           /* brilho do material */  
-float diffuse[4]=                /* reflectancia difusa do material */
-    { 1.2, 1.2, 1.2, 1 };
-float specular[4]=               /* reflectancia especular do material */
-    { 0.2, 0.2, 0.2, 1 };
-
-char key_pressed[256];           /* keymap continuo */
-char key_hit[256];               /* keymap toggle */
-
-char fps_str[8] = "O FPS";       /* fps na tela */
-char status_str[2][256];         /* variaveis na tela */
-
-char hide_text = 0;              /* esconder texto */
-char grab = 1;
-
-GLuint mapa;
-
-void (*desenhar_terreno)(void) = terrainDraw;
+void (*desenhar_terreno)(void) = terrenoecasaDraw;
 
 void cubep(float posx, float posy, float posz)
 {
@@ -129,7 +85,7 @@ void setup_projection()
     glLoadIdentity ();
     gluPerspective(45,
                    (GLfloat) res_x /
-                   (GLfloat) res_y, 1, 200);
+                   (GLfloat) res_y, 0.1, 10000);
     glMatrixMode (GL_MODELVIEW);
 }
 
@@ -144,8 +100,9 @@ void draw_light_point()
 
 void draw()
 {
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_color);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_color);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, light_color);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, light_color);
+
     glMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
     glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, diffuse);
@@ -154,13 +111,17 @@ void draw()
     glColor3f (1.0, 1.0, 1.0);
 
     setup_projection();
-    glLoadIdentity ();
+    glLoadIdentity ();  
 
     glRotatef(phi, -1, 0, 0);
     glRotatef(theta, 0, -1, 0);
+
     glTranslatef(-mypos.x, -mypos.y, -mypos.z);
 
+    float luz1[4] = { mypos.x, mypos.y+50, mypos.z, 1 };
+
     glLightfv(GL_LIGHT0, GL_POSITION, light);
+    glLightfv(GL_LIGHT1, GL_POSITION, luz1);
 
     draw_light_point();
 
@@ -181,21 +142,30 @@ void initgl()
 
     glShadeModel(GL_SMOOTH);
 
-    glPointSize(5.0);
+    glPointSize(1.5);
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
-    float black[4]={ 0, 0, 0, 0 };
-    float white[4]={ 1, 1, 1, 1 };
+    float ambient[]={ 0.005, 0.005, 0.005, 0 };
 
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
 
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, black);
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
 
     glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
-    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.01);
+    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.0001);
     glEnable(GL_LIGHT0);
+
+    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.05);
+
+    float luz0[]={ 1, 2, 3, 1 };
+
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, luz0);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, luz0);
+
+    glEnable(GL_LIGHT1);
+
     glEnable(GL_LIGHTING);
 }
 
@@ -203,9 +173,7 @@ void event_handler(SDL_Event ev)
 {
     if (ev.type == SDL_QUIT ||
         (ev.type == SDL_KEYDOWN &&
-         //(ev.key.keysym.sym == SDLK_ESCAPE ||
-          (ev.key.keysym.mod == KMOD_LALT &&
-           ev.key.keysym.sym == SDLK_F4))) {
+         (ev.key.keysym.sym == SDLK_ESCAPE))) {
 
         SDL_Quit();
         exit(0);
@@ -239,8 +207,8 @@ void event_handler(SDL_Event ev)
 
 void toggle()
 {
-    if (key_hit[SDLK_ESCAPE]) {
-        key_hit[SDLK_ESCAPE] = 0;
+    if (key_hit[SDLK_F2]) {
+        key_hit[SDLK_F2] = 0;
             SDL_WM_GrabInput(SDL_GRAB_OFF);
             SDL_ShowCursor(SDL_ENABLE);
             grab = 0;
@@ -263,9 +231,9 @@ void toggle()
     }
     if (key_hit['k']) {
         key_hit['k'] = 0;
-        light_color[0] = 0.75;
-        light_color[1] = 0.6;
-        light_color[2] = 0.45;
+        light_color[0] = 1;
+        light_color[1] = 1;
+        light_color[2] = 1;
     }
 
     if (key_hit['1']) {
@@ -284,14 +252,37 @@ void toggle()
         key_hit['4'] = 0;
         desenhar_terreno = paredesDraw;
     }
+    if (key_hit['5']) {
+        key_hit['5'] = 0;
+        desenhar_terreno = terrenoecasaDraw;
+    }
+    if (key_hit['6']) {
+        key_hit['6'] = 0;
+        desenhar_terreno = terrenoecasa2Draw;
+    }
+
+    if (key_hit['-']) {
+        key_hit['-'] = 0;
+        if (glIsEnabled(GL_LIGHT0))
+            glDisable(GL_LIGHT0);
+        else
+            glEnable(GL_LIGHT0);
+    }
+    if (key_hit['=']) {
+        key_hit['='] = 0;
+        if (glIsEnabled(GL_LIGHT1))
+            glDisable(GL_LIGHT1);
+        else
+            glEnable(GL_LIGHT1);
+    }
 }
 
 void model(float dt)
 {
-    float vel_vel = 10;
+    float vel_vel = 100;
 
-    float color_vel = 0.2;
-    float param_vel = 5;
+    float color_vel = 0.8;
+    float param_vel = 100;
     float shin_vel = 50;
 
     float c = color_vel * dt;
@@ -356,10 +347,11 @@ void model(float dt)
         shininess = 0;
 }
 
+float rluz = 0;
+
 void physics(float dt)
 {
     float rad = M_PI / 180;
-    float ang_vel_light = 10;
 
     float vel_sin = vel * sin(rad * theta) * dt;
     float vel_cos = vel * cos(rad * theta) * dt;
@@ -388,11 +380,33 @@ void physics(float dt)
         mypos.z -= vel_sin;
     }
 
-    if (!stop_light)
-        theta_light += ang_vel_light * dt;
+    float ang_vel_light = 1000;
 
-    light[0] = cos(rad * theta_light) * 5;
-    light[2] = sin(rad * theta_light) * 5;
+    static float theta_light = 0;
+    static int dir = 0;
+
+    if (!stop_light) {
+        theta_light += (100+rluz) * dt;
+
+        float cap = 10 + rluz/2;
+
+        if (dir == 0) {
+            rluz += cap * dt;
+            if (rluz > 1000)
+                dir = 1;
+            if (rluz > 2000)
+                rluz = 2000;
+        }
+        else if (dir == 1) {
+            rluz -=  cap * dt;
+            if (rluz < 5)
+                dir = 0;
+            if (rluz < 0)
+                rluz = 0;
+        }
+    }
+
+    light[0] = cos(rad * theta_light) * rluz;
 }
 
 int main(int argc, char *argv[])
@@ -461,15 +475,15 @@ int main(int argc, char *argv[])
         old_time = new_time;
         count++;
 
-        snprintf(status_str[0], 256, "vel %6.3f pos (% 7.3f,% 7.3f,% 7.3f) "
-                 "theta % 6.1f phi % 6.1f",
+        snprintf(status_str[0], 256, "vel %.1f pos (% 9.3f,% 7.3f,% 9.3f) "
+                 "theta % 6.1f phi % 5.1f",
                  vel, mypos.x, mypos.y, mypos.z,
                  theta, phi);
 
 
-        snprintf(status_str[1], 256, "luz (% 6.3f,% 6.3f,% 6.3f) "
-                 "cor (% 6.3f, % 6.3f, % 6.3f) h %.0f s %.2f d %.2f",
-                 light[0], light[1], light[2],
+        snprintf(status_str[1], 256, "l% 8.2f, %.0f,%.0f r%7.1f "
+                 "c%6.3f,%6.3f,%6.3f h%.0f s%.2f d%.2f",
+                 light[0], light[1], light[2], rluz,
                  light_color[0], light_color[1], light_color[2],
                  shininess, specular[0], diffuse[0]);
 

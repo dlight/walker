@@ -7,15 +7,15 @@ CC=gcc
 
 CFLAGS=-std=c99 -pipe -I ./mesh
 
-all : bin/prog
+all : walker
 
-mesh/%.c mesh/%.h : mesh/%.obj mesh/%.mtl
-	./tools/obj2opengl.pl -scale 20 $<
+mesh/%.c mesh/%.h : mesh/%.obj mesh/%.mtl Makefile
+	./tools/obj2opengl.pl -scale 10 $<
 
 mesh/%.o : mesh/%.c
-	$(CC) -c -o $@ $<
+	$(CC) -pipe -c -o $@ $<
 
-bin/prog: prog.c nanosec.h $(OBJ) $(HEADER)
+walker: walker.c nanosec.h $(OBJ) $(HEADER)
 	if [[ $$(uname -s) = Linux ]]; then \
 		$(CC) $(CFLAGS) `pkg-config --cflags --libs sdl gl glu` \
 			-lglut $(OBJ) $< -o $@; \
@@ -25,11 +25,14 @@ bin/prog: prog.c nanosec.h $(OBJ) $(HEADER)
 	fi
 
 
-run : bin/prog
-	./bin/prog
+run : walker
+	./walker
 
-fs : bin/prog
-	./bin/prog -fs
+fs : walker
+	./walker -fs
+
+note : walker
+	./walker -fs 1024 600
 
 clean :
-	rm -f bin/prog mesh/*.h mesh/*.c mesh/*.o
+	rm -f walker mesh/*.{h,c,o}
