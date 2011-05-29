@@ -9,13 +9,13 @@ CFLAGS=-std=c99 -pipe -I ./mesh
 
 all : walker
 
-mesh/%.c mesh/%.h : mesh/%.obj mesh/%.mtl Makefile
-	./tools/obj2opengl.pl -scale 10 $<
+mesh/%.c mesh/%.h : mesh/%.obj mesh/%.mtl
+	./tools/obj2opengl.pl -scale 1 $<
 
 mesh/%.o : mesh/%.c
 	$(CC) -pipe -c -o $@ $<
 
-walker: walker.c nanosec.h $(OBJ) $(HEADER)
+walker: walker.c param.h nanosec.h $(OBJ) $(HEADER)
 	if [[ $$(uname -s) = Linux ]]; then \
 		$(CC) $(CFLAGS) `pkg-config --cflags --libs sdl gl glu` \
 			-lglut $(OBJ) $< -o $@; \

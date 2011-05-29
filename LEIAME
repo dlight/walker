@@ -1,4 +1,4 @@
-Programa incompleto. Testado so no linux.
+Programa incompleto. Testado no linux e mac os x.
 
 Dependencias:
  * opengl
@@ -6,7 +6,6 @@ Dependencias:
 
 Para compilar:
 
-./configure
 make
 
 Para rodar:
@@ -15,6 +14,6 @@ make run
 
 ou
 
-./bin/prog
-./bin/prog 1024 758
-./bin/prog -fs
+./walker
+./walker 1024 758
+./walker -fs 1024 758

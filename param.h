@@ -6,17 +6,17 @@ typedef struct {
 
 int res_x = 640, res_y = 480;    /* resolucao padrao */
 
-float vel = 500;                 /* velocidade linear */
+float vel = 50;                 /* velocidade linear */
 float ang_vel = 0.2 ;            /* velocidade angular */
 
-float theta = -357;              /* orientacao no plano xz */
-float phi = 1.2;                 /* orientacao no plano xy */
+float theta = -271;              /* orientacao no plano xz */
+float phi = 0;                  /* orientacao no plano xy */
 
 float max_phi = 90;              /* limitacao ao olhar pra cima */
 float min_phi = -90;
 
 vec3 mypos =                     /* posicao do personagem */
-    { .x = -550, .y = 280, .z = 1870 };
+    { .x = 620, .y = 42, .z = 18 };
 
 
 float light[4] =                 /* posicao da luz 0 */
@@ -24,7 +24,7 @@ float light[4] =                 /* posicao da luz 0 */
 char stop_light = 0;             /* luz 0 esta parada? */
 
 float light_color[4] =           /* cor da luz 1 */
-    { 1, 1, 1, 0 };
+    { 0.1, 0.11, 0.1, 0 };
 
 float shininess = 128;           /* brilho do material */  
 float diffuse[4]=                /* reflectancia difusa */

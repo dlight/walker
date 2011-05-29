@@ -21,8 +21,9 @@
 #include "mesh/paredes.h"
 #include "mesh/terrenoecasa.h"
 #include "mesh/terrenoecasa2.h"
+#include "mesh/casa_montanha.h"
 
-void (*desenhar_terreno)(void) = terrenoecasaDraw;
+void (*desenhar_terreno)(void) = casa_montanhaDraw;
 
 void cubep(float posx, float posy, float posz)
 {
@@ -261,6 +262,11 @@ void toggle()
         desenhar_terreno = terrenoecasa2Draw;
     }
 
+    if (key_hit['7']) {
+        key_hit['7'] = 0;
+        desenhar_terreno = casa_montanhaDraw;
+    }
+
     if (key_hit['-']) {
         key_hit['-'] = 0;
         if (glIsEnabled(GL_LIGHT0))
@@ -279,7 +285,7 @@ void toggle()
 
 void model(float dt)
 {
-    float vel_vel = 100;
+    float vel_vel = 10;
 
     float color_vel = 0.8;
     float param_vel = 100;
