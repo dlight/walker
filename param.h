@@ -6,11 +6,11 @@ typedef struct {
 
 int res_x = 640, res_y = 480;    /* resolucao padrao */
 
-float vel = 50;                 /* velocidade linear */
+float vel = 150;                 /* velocidade linear */
 float ang_vel = 0.2 ;            /* velocidade angular */
 
 float theta = -271;              /* orientacao no plano xz */
-float phi = 0;                  /* orientacao no plano xy */
+float phi = 0;                   /* orientacao no plano xy */
 
 float max_phi = 90;              /* limitacao ao olhar pra cima */
 float min_phi = -90;

@@ -22,8 +22,10 @@
 #include "mesh/terrenoecasa.h"
 #include "mesh/terrenoecasa2.h"
 #include "mesh/casa_montanha.h"
+#include "mesh/casa_montanha_rapido.h"
+#include "mesh/com_textura.h"
 
-void (*desenhar_terreno)(void) = casa_montanhaDraw;
+void (*desenhar_terreno)(void) = casa_montanha_rapidoDraw;
 
 void cubep(float posx, float posy, float posz)
 {
@@ -137,7 +139,7 @@ void draw()
 }
 void initgl()
 {
-    glClearColor (0.0, 0.0, 0.0, 0.0);
+    glClearColor (0.0, 0.0, 0.2, 0.0);
 
     glViewport (0, 0, res_x, res_y); 
 
@@ -165,7 +167,7 @@ void initgl()
     glLightfv(GL_LIGHT0, GL_DIFFUSE, luz0);
     glLightfv(GL_LIGHT0, GL_SPECULAR, luz0);
 
-    glEnable(GL_LIGHT1);
+    //glEnable(GL_LIGHT1);
 
     glEnable(GL_LIGHTING);
 }
@@ -267,6 +269,16 @@ void toggle()
         desenhar_terreno = casa_montanhaDraw;
     }
 
+    if (key_hit['8']) {
+        key_hit['8'] = 0;
+        desenhar_terreno = casa_montanha_rapidoDraw;
+    }
+
+    if (key_hit['9']) {
+        key_hit['9'] = 0;
+        desenhar_terreno = com_texturaDraw;
+    }
+
     if (key_hit['-']) {
         key_hit['-'] = 0;
         if (glIsEnabled(GL_LIGHT0))
@@ -285,7 +297,7 @@ void toggle()
 
 void model(float dt)
 {
-    float vel_vel = 10;
+    float vel_vel = 100;
 
     float color_vel = 0.8;
     float param_vel = 100;
@@ -353,7 +365,7 @@ void model(float dt)
         shininess = 0;
 }
 
-float rluz = 0;
+float rluz = 500;
 
 void physics(float dt)
 {
