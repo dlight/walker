@@ -24,13 +24,13 @@ float light[4] =                 /* posicao da luz 0 */
 char stop_light = 0;             /* luz 0 esta parada? */
 
 float light_color[4] =           /* cor da luz 1 */
-    { 0.1, 0.11, 0.1, 0 };
+    { 1, 1, 1, 0 };
 
-float shininess = 128;           /* brilho do material */  
+float shininess = 2;           /* brilho do material */  
 float diffuse[4]=                /* reflectancia difusa */
-    { 15.2, 15.2, 15.2, 1 };
+    { 15, 15, 15, 1 };
 float specular[4]=               /* reflectancia especular */
-    { 15.2, 15.2, 15.2, 1 };
+    { 2, 2, 2, 1 };
 
 char key_pressed[256];           /* keymap continuo */
 char key_hit[256];               /* keymap toggle */
@@ -40,3 +40,5 @@ char status_str[3][256];         /* variaveis na tela */
 
 char hide_text = 0;              /* esconder texto */
 char grab = 1;                   /* se o mouse esta preso na janela */
+
+char texture = 1;

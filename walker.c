@@ -15,6 +15,8 @@
 #include <GL/glut.h>
 #endif
 
+#include "png-tex2.h"
+
 #include "mesh/terrain.h"
 #include "mesh/terrain2.h"
 #include "mesh/terrain3.h"
@@ -25,7 +27,7 @@
 #include "mesh/casa_montanha_rapido.h"
 #include "mesh/com_textura.h"
 
-void (*desenhar_terreno)(void) = casa_montanha_rapidoDraw;
+void (*desenhar_terreno)(void) = com_texturaDraw;
 
 void cubep(float posx, float posy, float posz)
 {
@@ -55,6 +57,8 @@ void draw_status()
 {
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
+    //glDisable(GL_TEXTURE_2D);
+
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -79,6 +83,7 @@ void draw_status()
         glutBitmapCharacter(GLUT_BITMAP_8_BY_13, status_str[1][i]);
 
     glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_TEXTURE_2D);
     glEnable(GL_LIGHTING);
 }
 
@@ -94,15 +99,24 @@ void setup_projection()
 
 void draw_light_point()
 {
+    //glDisable(GL_TEXTURE_2D);
     glDisable(GL_LIGHTING);
     glBegin(GL_POINTS);
     glVertex3f(light[0], light[1], light[2]);
     glEnd();
     glEnable(GL_LIGHTING);
+    //glEnable(GL_TEXTURE_2D);
 }
 
 void draw()
 {
+    if (texture) {
+        glEnable(GL_TEXTURE_2D);
+        printf("a\n");
+    }
+    else
+        glDisable(GL_TEXTURE_2D);
+
     glLightfv(GL_LIGHT1, GL_DIFFUSE, light_color);
     glLightfv(GL_LIGHT1, GL_SPECULAR, light_color);
 
@@ -126,11 +140,13 @@ void draw()
     glLightfv(GL_LIGHT0, GL_POSITION, light);
     glLightfv(GL_LIGHT1, GL_POSITION, luz1);
 
-    draw_light_point();
+    desenhar_terreno();
+
+    glDisable(GL_TEXTURE_2D);
 
     layer(0);
 
-    desenhar_terreno();
+    draw_light_point();
 
     if (!hide_text)
         draw_status();
@@ -139,35 +155,38 @@ void draw()
 }
 void initgl()
 {
-    glClearColor (0.0, 0.0, 0.2, 0.0);
+    glClearColor (0.0, 0.0, 0.2, 0.5);
 
     glViewport (0, 0, res_x, res_y); 
 
     glShadeModel(GL_SMOOTH);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
     glPointSize(1.5);
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
+    glEnable(GL_TEXTURE_2D);
+    
     float ambient[]={ 0.005, 0.005, 0.005, 0 };
 
-    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
+    // faz ficar lento, e nao vi nenhum ganho
+    //glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
 
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
 
     glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
     glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.0001);
     glEnable(GL_LIGHT0);
+    //glEnable(GL_LIGHT1);
 
     glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.05);
 
-    float luz0[]={ 1, 2, 3, 1 };
+    float luz0[]={ 5, 5, 5, 1 };
 
     glLightfv(GL_LIGHT0, GL_DIFFUSE, luz0);
     glLightfv(GL_LIGHT0, GL_SPECULAR, luz0);
-
-    //glEnable(GL_LIGHT1);
 
     glEnable(GL_LIGHTING);
 }
@@ -279,6 +298,11 @@ void toggle()
         desenhar_terreno = com_texturaDraw;
     }
 
+    if (key_hit['0']) {
+        key_hit['0'] = 0;
+        texture = !texture;
+    }
+
     if (key_hit['-']) {
         key_hit['-'] = 0;
         if (glIsEnabled(GL_LIGHT0))
@@ -297,7 +321,7 @@ void toggle()
 
 void model(float dt)
 {
-    float vel_vel = 100;
+    float vel_vel = 500;
 
     float color_vel = 0.8;
     float param_vel = 100;
@@ -457,6 +481,13 @@ int main(int argc, char *argv[])
 
     initgl();
 
+    unsigned w, h;
+
+    GLuint q = loadTexture("./mesh/com_textura.png", &w, &h);
+
+    printf("qq %d\n", q);
+    //exit(0);
+
     SDL_Event ev;
 
     while (1)
@@ -500,10 +531,11 @@ int main(int argc, char *argv[])
 
 
         snprintf(status_str[1], 256, "l% 8.2f, %.0f,%.0f r%7.1f "
-                 "c%6.3f,%6.3f,%6.3f h%.0f s%.2f d%.2f",
+                 "c%6.3f,%6.3f,%6.3f h%.0f s%.2f d%.2f t%d l%d,%d",
                  light[0], light[1], light[2], rluz,
                  light_color[0], light_color[1], light_color[2],
-                 shininess, specular[0], diffuse[0]);
+                 shininess, specular[0], diffuse[0], texture,
+                 glIsEnabled(GL_LIGHT0), glIsEnabled(GL_LIGHT1));
 
         toggle();
         model(dt);
