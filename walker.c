@@ -55,18 +55,13 @@ void layer(float posz)
 
 void draw_status()
 {
-    glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
-    //glDisable(GL_TEXTURE_2D);
-
-
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0, res_x, 0, res_y);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glColor3f(1, 0.4, 0);
+    glColor3f(1, 1, 1);
     glRasterPos2i(10, 10);
 
     for (int i = 0; fps_str[i] != '\0'; i++)
@@ -81,10 +76,6 @@ void draw_status()
 
     for (int i = 0; status_str[1][i] != '\0'; i++)
         glutBitmapCharacter(GLUT_BITMAP_8_BY_13, status_str[1][i]);
-
-    glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_TEXTURE_2D);
-    glEnable(GL_LIGHTING);
 }
 
 void setup_projection()
@@ -99,23 +90,18 @@ void setup_projection()
 
 void draw_light_point()
 {
-    //glDisable(GL_TEXTURE_2D);
-    glDisable(GL_LIGHTING);
     glBegin(GL_POINTS);
     glVertex3f(light[0], light[1], light[2]);
     glEnd();
-    glEnable(GL_LIGHTING);
-    //glEnable(GL_TEXTURE_2D);
 }
 
 void draw()
 {
-    if (texture) {
+    if (texture)
         glEnable(GL_TEXTURE_2D);
-        printf("a\n");
-    }
-    else
-        glDisable(GL_TEXTURE_2D);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
 
     glLightfv(GL_LIGHT1, GL_DIFFUSE, light_color);
     glLightfv(GL_LIGHT1, GL_SPECULAR, light_color);
@@ -146,6 +132,9 @@ void draw()
 
     layer(0);
 
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+
     draw_light_point();
 
     if (!hide_text)
@@ -165,30 +154,21 @@ void initgl()
     glPointSize(1.5);
 
     glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-
-    glEnable(GL_TEXTURE_2D);
     
     float ambient[]={ 0.005, 0.005, 0.005, 0 };
-
-    // faz ficar lento, e nao vi nenhum ganho
-    //glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
 
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
 
     glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
     glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.0001);
     glEnable(GL_LIGHT0);
-    //glEnable(GL_LIGHT1);
 
     glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.05);
 
-    float luz0[]={ 5, 5, 5, 1 };
+    float luz0[]={ 3, 3, 3, 1 };
 
     glLightfv(GL_LIGHT0, GL_DIFFUSE, luz0);
     glLightfv(GL_LIGHT0, GL_SPECULAR, luz0);
-
-    glEnable(GL_LIGHTING);
 }
 
 void event_handler(SDL_Event ev)

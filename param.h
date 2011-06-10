@@ -6,7 +6,7 @@ typedef struct {
 
 int res_x = 640, res_y = 480;    /* resolucao padrao */
 
-float vel = 150;                 /* velocidade linear */
+float vel = 250;                 /* velocidade linear */
 float ang_vel = 0.2 ;            /* velocidade angular */
 
 float theta = -271;              /* orientacao no plano xz */
@@ -24,11 +24,11 @@ float light[4] =                 /* posicao da luz 0 */
 char stop_light = 0;             /* luz 0 esta parada? */
 
 float light_color[4] =           /* cor da luz 1 */
-    { 1, 1, 1, 0 };
+    { 0.5, 0.5, 0.5, 0 };
 
 float shininess = 2;           /* brilho do material */  
 float diffuse[4]=                /* reflectancia difusa */
-    { 15, 15, 15, 1 };
+    { 10, 10, 10, 1 };
 float specular[4]=               /* reflectancia especular */
     { 2, 2, 2, 1 };
 

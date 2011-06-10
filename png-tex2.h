@@ -10,17 +10,6 @@ typedef struct {
     png_byte a;
  } rgba;
 
-/** loadTexture
- *     loads a png file into an opengl texture object, using cstdio , libpng, and opengl.
- * 
- *     \param filename : the png file to be loaded
- *     \param width : width of png, to be updated as a side effect of this function
- *     \param height : height of png, to be updated as a side effect of this function
- * 
- *     \return GLuint : an opengl texture id.  Will be 0 if there is a major error,
- *                                     should be validated by the client of this function.
- * 
- */
 GLuint loadTexture(char* filename, unsigned* width, unsigned* height) 
 {
     fprintf(stderr, "   Compiled with libpng %s; using libpng %s.\n",
@@ -28,17 +17,14 @@ GLuint loadTexture(char* filename, unsigned* width, unsigned* height)
     fprintf(stderr, "   Compiled with zlib %s; using zlib %s.\n",
             ZLIB_VERSION, zlib_version);
 
-    //header for testing if it is a png
     unsigned char header[8];
  
-    //open file as binary
     FILE *fp = fopen(filename, "rb");
     if (!fp) {
         printf("can't open file\n");
         return TEXTURE_LOAD_ERROR;
     }
  
-    //read the header
     fread(header, 1, 8, fp);
  
     if (!png_check_sig(header, 8)) {
@@ -73,12 +59,8 @@ GLuint loadTexture(char* filename, unsigned* width, unsigned* height)
  
     png_init_io(png_ptr, fp);
     png_set_sig_bytes(png_ptr, 8);
- 
-    // read all the info up to the image data
-    png_read_info(png_ptr, info_ptr);
-    //png_read_update_info(png_ptr, info_ptr);
 
-    // get info about png
+    png_read_info(png_ptr, info_ptr);
 
     png_uint_32 w, h;
 
@@ -103,34 +85,25 @@ GLuint loadTexture(char* filename, unsigned* width, unsigned* height)
         png_byte* row = row_pointers[y];
         for (int x=0; x<w; x++) {
             png_byte* ptr = &(row[x*4]);
-            //printf("Pixel at position [ %d - %d ] has RGBA values: %d - %d - %d - %d\n",
-            //x, y, ptr[0], ptr[1], ptr[2], ptr[3]);
 
-            rgba* ptr2 = &(image_data[x*w]);
+            rgba* ptr2 = &(image_data[y*h]);
 
-            ptr2[y].r = ptr[0];
-            ptr2[y].g = ptr[1];
-            ptr2[y].b = ptr[2];
-            ptr2[y].a = ptr[3];
+            ptr2[x].r = ptr[0];
+            ptr2[x].g = ptr[1];
+            ptr2[x].b = ptr[2];
+            ptr2[x].a = ptr[3];
         }
     }
  
-    //Now generate the OpenGL texture object
     GLuint texture;
-    printf("b\n");
 
     glGenTextures(1, &texture);
-    printf("r\n");
     glBindTexture(GL_TEXTURE_2D, texture);
-    printf("q\n");
 
     glTexImage2D(GL_TEXTURE_2D,0, GL_RGBA, w, h, 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) image_data);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
-
-    //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
     free(image_data);
     free(row_pointers);
