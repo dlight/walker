@@ -27,6 +27,8 @@
 #include "mesh/casa_montanha_rapido.h"
 #include "mesh/com_textura.h"
 
+GLuint textu, heightmap;
+
 void (*desenhar_terreno)(void) = com_texturaDraw;
 
 void cubep(float posx, float posy, float posz)
@@ -55,12 +57,7 @@ void layer(float posz)
 
 void draw_status()
 {
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D(0, res_x, 0, res_y);
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
     glColor3f(1, 1, 1);
     glRasterPos2i(10, 10);
 
@@ -78,14 +75,63 @@ void draw_status()
         glutBitmapCharacter(GLUT_BITMAP_8_BY_13, status_str[1][i]);
 }
 
-void setup_projection()
+void draw_map()
+{
+    glBindTexture(GL_TEXTURE_2D, heightmap);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glColor4f (0.1, 0.8, 0.95, 0.6);
+
+    int size = 200;
+    int m = 5;
+
+    glPushMatrix();
+    glTranslated(res_x - size - m, res_y - size - m, 0);
+
+    glBegin(GL_QUADS);
+
+    glTexCoord2f(0, 1);    glVertex2i(0, 0);
+    glTexCoord2f(1, 1);    glVertex2i(size, 0);
+    glTexCoord2f(1, 0);    glVertex2i(size, size);
+    glTexCoord2f(0, 0);    glVertex2i(0, size);
+
+    glEnd();
+
+    glDisable(GL_BLEND);
+    glDisable(GL_TEXTURE_2D);
+
+    glColor4f(1, 0, 0, 1);
+
+    glBegin(GL_POINTS);
+
+    glVertex2f(-mypos.z / 10 + 95,
+               - mypos.x / 10 + 105);
+
+    glEnd();
+
+    glPopMatrix();
+}
+
+void projection_2d()
+{
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, res_x, 0, res_y);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
+void projection_3d()
 {
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     gluPerspective(45,
                    (GLfloat) res_x /
-                   (GLfloat) res_y, 0.1, 10000);
+                   (GLfloat) res_y, 10, 10000);
     glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity();
 }
 
 void draw_light_point()
@@ -113,8 +159,7 @@ void draw()
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor3f (1.0, 1.0, 1.0);
 
-    setup_projection();
-    glLoadIdentity ();  
+    projection_3d();
 
     glRotatef(phi, -1, 0, 0);
     glRotatef(theta, 0, -1, 0);
@@ -126,6 +171,7 @@ void draw()
     glLightfv(GL_LIGHT0, GL_POSITION, light);
     glLightfv(GL_LIGHT1, GL_POSITION, luz1);
 
+    glBindTexture(GL_TEXTURE_2D, textu);
     desenhar_terreno();
 
     glDisable(GL_TEXTURE_2D);
@@ -133,9 +179,19 @@ void draw()
     layer(0);
 
     glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
 
     draw_light_point();
+
+    projection_2d();
+
+    glDisable(GL_DEPTH_TEST);
+
+
+    glEnable(GL_TEXTURE_2D);
+
+    draw_map();
+
+    glDisable(GL_TEXTURE_2D);
 
     if (!hide_text)
         draw_status();
@@ -151,6 +207,8 @@ void initgl()
     glShadeModel(GL_SMOOTH);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     glPointSize(1.5);
 
     glEnable(GL_CULL_FACE);
@@ -161,7 +219,8 @@ void initgl()
 
     glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
     glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.0001);
-    glEnable(GL_LIGHT0);
+
+    glEnable(GL_LIGHT1);
 
     glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.05);
 
@@ -463,10 +522,10 @@ int main(int argc, char *argv[])
 
     unsigned w, h;
 
-    GLuint q = loadTexture("./mesh/com_textura.png", &w, &h);
-
-    printf("qq %d\n", q);
-    //exit(0);
+    textu = loadTexture("./mesh/com_textura.png", &w, &h);
+    printf("img %d, %d\n", w, h);
+    heightmap = loadTexture("./mesh/heightmap_small.png", &w, &h);
+    printf("heightmap %d, %d\n", w, h);
 
     SDL_Event ev;
 
@@ -504,15 +563,14 @@ int main(int argc, char *argv[])
         old_time = new_time;
         count++;
 
-        snprintf(status_str[0], 256, "vel %.1f pos (% 9.3f,% 7.3f,% 9.3f) "
-                 "theta % 6.1f phi % 5.1f",
+        snprintf(status_str[0], 256, "v%f p(% 9.3f,% 7.3f,% 9.3f) "
+                 "a(% 6.1f,%5.1f)",
                  vel, mypos.x, mypos.y, mypos.z,
                  theta, phi);
 
 
-        snprintf(status_str[1], 256, "l% 8.2f, %.0f,%.0f r%7.1f "
+        snprintf(status_str[1], 256,
                  "c%6.3f,%6.3f,%6.3f h%.0f s%.2f d%.2f t%d l%d,%d",
-                 light[0], light[1], light[2], rluz,
                  light_color[0], light_color[1], light_color[2],
                  shininess, specular[0], diffuse[0], texture,
                  glIsEnabled(GL_LIGHT0), glIsEnabled(GL_LIGHT1));
