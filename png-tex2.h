@@ -68,6 +68,9 @@ GLuint loadTexture(char* filename, unsigned* width, unsigned* height)
 
     h = png_get_image_height(png_ptr, info_ptr);
 
+    *width = w;
+    *height = h;
+
     png_bytep *row_pointers =
         (png_bytep*) malloc(sizeof(png_bytep) * h);
     for (int y=0; y<h; y++) {
@@ -104,6 +107,7 @@ GLuint loadTexture(char* filename, unsigned* width, unsigned* height)
                  GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) image_data);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     free(image_data);
     free(row_pointers);

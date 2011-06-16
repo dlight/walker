@@ -38,7 +38,7 @@ char key_hit[256];               /* keymap toggle */
 char fps_str[8] = "O FPS";       /* fps na tela */
 char status_str[3][256];         /* variaveis na tela */
 
-char hide_text = 0;              /* esconder texto */
+char hide_text = 1;              /* esconder texto */
 char grab = 1;                   /* se o mouse esta preso na janela */
 
 char texture = 1;
