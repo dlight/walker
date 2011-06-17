@@ -1,16 +1,18 @@
 #define PNG_DEBUG 3
+
+#include <stdlib.h>
 #include <png.h>
 
-#define TEXTURE_LOAD_ERROR 0
+#ifdef MAC
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
 
-typedef struct {
-    png_byte r;
-    png_byte g;
-    png_byte b;
-    png_byte a;
- } rgba;
+#include "texture.h"
 
-GLuint loadTexture(char* filename, unsigned* width, unsigned* height) 
+rgba* load_png(char* filename, unsigned* width,
+               unsigned* height) 
 {
     fprintf(stderr, "   Compiled with libpng %s; using libpng %s.\n",
         PNG_LIBPNG_VER_STRING, png_libpng_ver);
@@ -22,7 +24,7 @@ GLuint loadTexture(char* filename, unsigned* width, unsigned* height)
     FILE *fp = fopen(filename, "rb");
     if (!fp) {
         printf("can't open file\n");
-        return TEXTURE_LOAD_ERROR;
+        return 0;
     }
  
     fread(header, 1, 8, fp);
@@ -30,7 +32,7 @@ GLuint loadTexture(char* filename, unsigned* width, unsigned* height)
     if (!png_check_sig(header, 8)) {
         fclose(fp);
         printf("signature error\n");
-        return TEXTURE_LOAD_ERROR;
+        return 0;
     }
  
     png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
@@ -39,7 +41,7 @@ GLuint loadTexture(char* filename, unsigned* width, unsigned* height)
     if (!png_ptr) {
         fclose(fp);
         printf("no png ptr\n");
-        return (TEXTURE_LOAD_ERROR);
+        return 0;
     }
  
     png_infop info_ptr = png_create_info_struct(png_ptr);
@@ -47,14 +49,14 @@ GLuint loadTexture(char* filename, unsigned* width, unsigned* height)
         printf("no info ptr\n");
         png_destroy_read_struct(&png_ptr, NULL, NULL);
         fclose(fp);
-        return (TEXTURE_LOAD_ERROR);
+        return 0;
     }
 
     if (setjmp(png_jmpbuf(png_ptr))) {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         fclose(fp);
         printf("png error really rs\n");
-        return (TEXTURE_LOAD_ERROR);
+        return 0;
     }
  
     png_init_io(png_ptr, fp);
@@ -82,7 +84,7 @@ GLuint loadTexture(char* filename, unsigned* width, unsigned* height)
     
     fclose(fp);
 
-    rgba* image_data = malloc(4 * sizeof(rgba) * w * h);
+    rgba* image_data = malloc(4 * sizeof(rgba) * w*h);
 
     for (int y=0; y<h; y++) {
         png_byte* row = row_pointers[y];
@@ -97,7 +99,15 @@ GLuint loadTexture(char* filename, unsigned* width, unsigned* height)
             ptr2[x].a = ptr[3];
         }
     }
- 
+
+    free(row_pointers);
+
+    return image_data;
+}
+
+GLuint setup_texture(rgba* image_data, unsigned w,
+                     unsigned h)
+{
     GLuint texture;
 
     glGenTextures(1, &texture);
@@ -108,9 +118,16 @@ GLuint loadTexture(char* filename, unsigned* width, unsigned* height)
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    free(image_data);
-    free(row_pointers);
  
     return texture;
+}
+
+GLuint png_texture(char* filename, unsigned* w,
+                   unsigned* h)
+{
+    rgba* t = load_png(filename, w, h);
+
+    return setup_texture(t, *w, *h);
+
+    free(t);
 }

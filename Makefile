@@ -3,9 +3,11 @@
 OBJ = $(subst .obj,.o,$(wildcard mesh/*.obj))
 HEADER = $(subst .obj,.h,$(wildcard mesh/*.obj))
 
-CC=gcc
+OS := $(shell uname -s)
 
-CFLAGS=-std=c99 -pipe -I ./mesh
+CC = gcc
+
+CFLAGS = -std=c99 -pipe -I ./mesh
 
 all : walker
 
@@ -15,15 +17,34 @@ mesh/%.c mesh/%.h : mesh/%.obj mesh/%.mtl
 mesh/%.o : mesh/%.c
 	$(CC) -pipe -c -o $@ $<
 
-walker: walker.c param.h nanosec.h png-tex2.h $(OBJ) $(HEADER)
-	if [[ $$(uname -s) = Linux ]]; then \
-		$(CC) $(CFLAGS) `pkg-config --cflags --libs sdl gl glu libpng` \
-			-lglut $(OBJ) $< -o $@; \
-	elif [[ $$(uname -s) = Darwin ]]; then \
-		$(CC) $(CFLAGS) -DMAC `pkg-config --cflags --libs sdl libpng` \
-		-framework GLUT -I /opt/local/include $(OBJ) $< -o $@; \
-	fi
+%.o : %.c
+	echo $< , $@
 
+use = `pkg-config --cflags --libs $(1)`
+
+ifeq ($(OS), Linux)
+OPENGL_FLAGS = $(call use,gl glu) -lglut
+else ifeq ($(OS), Darwin)
+OPENGL_FLAGS = -framework GLUT -I /opt/local/include
+OSF = -DMAC
+endif
+
+compile = $(CC) $(CFLAGS) $(OSF)                    \
+	$(call OPENGL_FLAGS) $(call use,sdl libpng) \
+	$(1) $(2) -c -o $(subst .c,.o,$(1))
+
+link = $(CC) $(CFLAGS) $(OSF)             \
+	$(call OPENGL_FLAGS) $(call use,sdl libpng) \
+	$(2) -o $(1)
+
+walker.o : walker.c param.h nanosec.h texture.h $(HEADER)
+	$(call compile, $<)
+
+texture.o : texture.c texture.h
+	$(call compile, $<)
+
+walker: walker.o texture.o $(OBJ)
+	$(call link, walker,$^)
 
 run : walker
 	./walker

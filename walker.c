@@ -15,7 +15,7 @@
 #include <GL/glut.h>
 #endif
 
-#include "png-tex2.h"
+#include "texture.h"
 
 #include "mesh/terrain.h"
 #include "mesh/terrain2.h"
@@ -522,9 +522,9 @@ int main(int argc, char *argv[])
 
     unsigned w, h;
 
-    textu = loadTexture("./mesh/com_textura.png", &w, &h);
+    textu = png_texture("./mesh/com_textura.png", &w, &h);
     printf("img %d, %d\n", w, h);
-    heightmap = loadTexture("./mesh/heightmap_small.png", &w, &h);
+    heightmap = png_texture("./mesh/heightmap_small.png", &w, &h);
     printf("heightmap %d, %d\n", w, h);
 
     SDL_Event ev;

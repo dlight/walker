@@ -32,8 +32,8 @@ float diffuse[4]=                /* reflectancia difusa */
 float specular[4]=               /* reflectancia especular */
     { 2, 2, 2, 1 };
 
-char key_pressed[256];           /* keymap continuo */
-char key_hit[256];               /* keymap toggle */
+char key_pressed[512];           /* keymap continuo */
+char key_hit[512];               /* keymap toggle */
 
 char fps_str[8] = "O FPS";       /* fps na tela */
 char status_str[3][256];         /* variaveis na tela */
