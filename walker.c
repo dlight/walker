@@ -44,8 +44,8 @@ int main(int argc, char *argv[])
     init_event_keys();
 
     glutInit(&argc, argv);
-    SDL_Surface* sdl = initsdl(mode);
 
+    initsdl(mode);
     initgl();
     carregar_texturas();
 
