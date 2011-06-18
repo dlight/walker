@@ -13,7 +13,8 @@ all : walker
 	@echo
 	@echo AEEEEEE
 	@echo
-	@echo compilou!
+	@echo compilou!!
+	@echo
 	@echo digite ./walker para rodar o programa
 	@echo para mais informacoes leia o README
 
@@ -51,6 +52,7 @@ event.o : event.c types.h event.h
 	$(call compile,$<)
 
 gl.o : gl.c gl.h types.h texture.h event.h $(HEADER)
+	$(call compile,$<)
 
 walker: nanosec.o texture.o event.o gl.o walker.o $(OBJ)
 	$(call link,$@,$^)

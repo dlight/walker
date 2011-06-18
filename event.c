@@ -1,3 +1,41 @@
+/* event.c : polling de eventos do sdl
+
+   COMO FUNCIONA
+
+   * Usamos a biblioteca SDL para gerenciar a interação com o teclado e
+   * mouse.
+
+   * O sdl envia um evento para cada interação (seja um movimento ou
+   * clique do mouse, ou uma tecla apertada). A função event_handler
+   * aqui lida com um único evento.
+
+   * Eventos no geral modificam variáveis de estado (que são essas
+   * variáveis globais aí embaixo). Elas são, no geral, usadas em gl.c
+   * para alterar o funcionamento do mundo virtual em si
+
+   * Teclas podem ser usadas em 2 modos: como interruptores (onde a
+   * tecla liga e desliga uma flag) ou como uma interação contínua.
+
+   * interruptores são lidados pela funcao toggle
+
+   * interações contínuas são lidadas pela função physics (no caso do
+   * movimento de seu personagem, etc) e pela função model (no caso de
+   * interações que nao envolvem o personagem, como mudar a reflectancia
+   * do material)
+
+   * interações contínuas recebem como entrada o /\t, tomado como base
+   * na ultima interacao feita. com um /\t baixo o suficiente, tem-se a
+   * ilusao de continuidade
+
+   * na funcao physics tb se move a luz (ja que o movimento dela eh
+   * continuo)
+
+   * o mouse eh preso na tela de uma forma meio tosca, que impede a
+   * pessoa de sair com alt+tab. dai, usa-se F2 para desgrudar o mouse
+   * (e um clique pra grudar denovo). usa-se esc pra sair do programa.
+
+*/
+
 #include <SDL/SDL.h>
 #include <math.h>
 

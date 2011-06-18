@@ -32,6 +32,9 @@
    * alem disso, existe aqui o initgl, que cria as luzes, insere
    * parametros ao opengl, etc.
 
+
+   * escrevo mais detalhes depois se for o caso..
+
  */
 
 

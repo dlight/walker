@@ -1,3 +1,23 @@
+/* walker.c : loop principal do arquivo
+
+   COMO FUNCIONA
+
+   * O programa está dividido em vários arquivos. Os mais importantes
+   * são:
+
+     * este daqui, walker.c - aqui está o main, e todo o setup inicial
+     * do SDL. os outros arquivos exportam funcoes, que este aqui usa
+     * como uma biblioteca
+
+     * event.c - lida com todo tipo de entrada do usuario e suas
+     * consequências imediatas, seja via teclado ou mouse. suas funcoes
+     * sao chamadas uma vez a cada iteracao do loop principal
+
+     * gl.c - lida com tudo relacionado com o opengl. eh o arquivo mais
+     * importante
+
+*/
+
 #include <SDL/SDL.h>
 
 #ifdef MAC
