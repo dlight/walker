@@ -1,3 +1,6 @@
+#ifndef PARAM_H
+#define PARAM_H
+
 typedef struct {
     float x;
     float y;
@@ -42,3 +45,5 @@ char hide_text = 1;              /* esconder texto */
 char grab = 1;                   /* se o mouse esta preso na janela */
 
 char texture = 1;
+
+#endif

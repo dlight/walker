@@ -1,3 +1,6 @@
+#ifndef TEXTURE_H
+#define TEXTURE_H
+
 typedef struct {
     unsigned char r;
     unsigned char g;
@@ -11,3 +14,5 @@ GLuint setup_texture(rgba* image_data, unsigned w,
                      unsigned h);
 GLuint png_texture(char* filename, unsigned* w,
                    unsigned* h);
+
+#endif

@@ -1,12 +1,5 @@
 #define GL_GLEXT_PROTOTYPES
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-
-#include "param.h"
-#include "nanosec.h"
-
 #include <SDL/SDL.h>
 
 #ifdef MAC
@@ -15,9 +8,15 @@
 #include <GL/glut.h>
 #endif
 
-#include "texture.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
 
 #include "mesh/ruinas.h"
+
+#include "nanosec.h"
+#include "param.h"
+#include "texture.h"
 
 GLuint ruinas_textura, ruinas_minimap;
 

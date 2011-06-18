@@ -44,7 +44,10 @@ walker.o : walker.c param.h nanosec.h texture.h $(HEADER)
 texture.o : texture.c texture.h
 	$(call compile,$<)
 
-walker: walker.o texture.o $(OBJ)
+nanosec.o : nanosec.c nanosec.h
+	$(call compile,$<)
+
+walker: nanosec.o texture.o walker.o $(OBJ)
 	$(call link,$@,$^)
 
 run : walker
