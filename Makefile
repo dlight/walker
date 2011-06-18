@@ -17,7 +17,7 @@ all : walker
 	@echo digite ./walker para rodar o programa
 	@echo para mais informacoes leia o LEIAME
 
-mesh/%.c mesh/%.h : mesh/%.obj mesh/%.mtl
+mesh/%.c mesh/%.h : mesh/%.obj
 	./tools/obj2opengl.pl -scale 1 $<
 
 mesh/%.o : mesh/%.c
@@ -70,4 +70,4 @@ clean-mesh-source :
 
 clean-code : clean clean-mesh
 
-mrproper : clean-codee clean-mesh-source
+mrproper : clean-code clean-mesh-source

@@ -17,19 +17,11 @@
 
 #include "texture.h"
 
-#include "mesh/terrain.h"
-#include "mesh/terrain2.h"
-#include "mesh/terrain3.h"
-#include "mesh/paredes.h"
-#include "mesh/terrenoecasa.h"
-#include "mesh/terrenoecasa2.h"
-#include "mesh/casa_montanha.h"
-#include "mesh/casa_montanha_rapido.h"
-#include "mesh/com_textura.h"
+#include "mesh/ruinas.h"
 
-GLuint textu, heightmap;
+GLuint ruinas_textura, ruinas_minimap;
 
-void (*desenhar_terreno)(void) = com_texturaDraw;
+void (*desenhar_terreno)(void) = ruinasDraw;
 
 void cubep(float posx, float posy, float posz)
 {
@@ -77,7 +69,7 @@ void draw_status()
 
 void draw_map()
 {
-    glBindTexture(GL_TEXTURE_2D, heightmap);
+    glBindTexture(GL_TEXTURE_2D, ruinas_minimap);
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -171,7 +163,7 @@ void draw()
     glLightfv(GL_LIGHT0, GL_POSITION, light);
     glLightfv(GL_LIGHT1, GL_POSITION, luz1);
 
-    glBindTexture(GL_TEXTURE_2D, textu);
+    glBindTexture(GL_TEXTURE_2D, ruinas_textura);
     desenhar_terreno();
 
     glDisable(GL_TEXTURE_2D);
@@ -295,46 +287,6 @@ void toggle()
         light_color[0] = 1;
         light_color[1] = 1;
         light_color[2] = 1;
-    }
-
-    if (key_hit['1']) {
-        key_hit['1'] = 0;
-        desenhar_terreno = terrainDraw;
-    }
-    if (key_hit['2']) {
-        key_hit['2'] = 0;
-        desenhar_terreno = terrain2Draw;
-    }
-    if (key_hit['3']) {
-        key_hit['3'] = 0;
-        desenhar_terreno = terrain3Draw;
-    }
-    if (key_hit['4']) {
-        key_hit['4'] = 0;
-        desenhar_terreno = paredesDraw;
-    }
-    if (key_hit['5']) {
-        key_hit['5'] = 0;
-        desenhar_terreno = terrenoecasaDraw;
-    }
-    if (key_hit['6']) {
-        key_hit['6'] = 0;
-        desenhar_terreno = terrenoecasa2Draw;
-    }
-
-    if (key_hit['7']) {
-        key_hit['7'] = 0;
-        desenhar_terreno = casa_montanhaDraw;
-    }
-
-    if (key_hit['8']) {
-        key_hit['8'] = 0;
-        desenhar_terreno = casa_montanha_rapidoDraw;
-    }
-
-    if (key_hit['9']) {
-        key_hit['9'] = 0;
-        desenhar_terreno = com_texturaDraw;
     }
 
     if (key_hit['0']) {
@@ -522,9 +474,9 @@ int main(int argc, char *argv[])
 
     unsigned w, h;
 
-    textu = png_texture("./mesh/com_textura.png", &w, &h);
+    ruinas_textura = png_texture("./mesh/ruinas.png", &w, &h);
     printf("img %d, %d\n", w, h);
-    heightmap = png_texture("./mesh/heightmap_small.png", &w, &h);
+    ruinas_minimap = png_texture("./mesh/ruinas_minimap.png", &w, &h);
     printf("heightmap %d, %d\n", w, h);
 
     SDL_Event ev;
