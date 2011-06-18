@@ -15,7 +15,7 @@ all : walker
 	@echo
 	@echo compilou!
 	@echo digite ./walker para rodar o programa
-	@echo para mais informacoes leia o LEIAME
+	@echo para mais informacoes leia o README
 
 mesh/%.c mesh/%.h : mesh/%.obj
 	./tools/obj2opengl.pl -scale 1 $<
