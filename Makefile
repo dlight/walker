@@ -38,7 +38,7 @@ compile = $(CC) -c $(OSF) $(call flags,cflags) $(1)
 
 link = $(CC) $(OSL) $(call flags,libs) $(2) -o $(1)
 
-walker.o : walker.c param.h nanosec.h texture.h $(HEADER)
+walker.o : walker.c types.h event.h nanosec.h texture.h $(HEADER)
 	$(call compile,$<)
 
 texture.o : texture.c texture.h
@@ -47,7 +47,10 @@ texture.o : texture.c texture.h
 nanosec.o : nanosec.c nanosec.h
 	$(call compile,$<)
 
-walker: nanosec.o texture.o walker.o $(OBJ)
+event.o : event.c types.h event.h
+	$(call compile,$<)
+
+walker: nanosec.o texture.o event.o walker.o $(OBJ)
 	$(call link,$@,$^)
 
 run : walker
