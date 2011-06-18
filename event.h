@@ -1,6 +1,8 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include <SDL/SDL.h>
+
 extern float theta;
 extern float phi;
 extern vec3 mypos;
