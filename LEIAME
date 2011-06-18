@@ -1,19 +1,32 @@
-Programa incompleto. Testado no linux e mac os x.
+Este programa é um trabalho da disciplina Computação Gráfica, do curso
+de Engenharia de Computação da UFRN.
 
-Dependencias:
+O trabalho está em andamento. Ele está sendo desenvolvido no Linux e Mac
+OS X.
+
+Integrantes do grupo:
+
+* Elias Gabriel Amaral da Silva
+* Thiago Frederico Costa Porciúncula
+* Hortôni Gomes da Costa Vieira Freire
+
+-------------------------------------------------------------------------
+
+Dependências:
+
  * opengl
  * sdl
+ * libpng
 
-Para compilar:
+Para compilar, digite:
 
-make
+  make
 
 Para rodar:
 
-make run
+  ./walker
 
-ou
+Mudar resolução, tela cheia..:
 
-./walker
-./walker 1024 758
-./walker -fs 1024 758
+  ./walker 1024 758
+  ./walker -fs 1024 758

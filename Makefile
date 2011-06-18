@@ -5,11 +5,17 @@ HEADER = $(subst .obj,.h,$(wildcard mesh/*.obj))
 
 OS := $(shell uname -s)
 
-CC = gcc
+#CC = gcc -pipe -std=c99
 
-CFLAGS = -std=c99 -pipe -I ./mesh
+CC = clang
 
 all : walker
+	@echo
+	@echo AEEEEEE
+	@echo
+	@echo compilou!
+	@echo digite ./walker para rodar o programa
+	@echo para mais informacoes leia o LEIAME
 
 mesh/%.c mesh/%.h : mesh/%.obj mesh/%.mtl
 	./tools/obj2opengl.pl -scale 1 $<
@@ -17,34 +23,29 @@ mesh/%.c mesh/%.h : mesh/%.obj mesh/%.mtl
 mesh/%.o : mesh/%.c
 	$(CC) -pipe -c -o $@ $<
 
-%.o : %.c
-	echo $< , $@
-
-use = `pkg-config --cflags --libs $(1)`
+use = `pkg-config --$(1) $(2)`
 
 ifeq ($(OS), Linux)
-OPENGL_FLAGS = $(call use,gl glu) -lglut
+flags = $(call use,$(1),gl glu sdl libpng)
+OSL = -lglut
 else ifeq ($(OS), Darwin)
-OPENGL_FLAGS = -framework GLUT -I /opt/local/include
+flags = -I /opt/local/include -framework GLUT \
+	$(call use,$(1),sdl libpng)
 OSF = -DMAC
 endif
 
-compile = $(CC) $(CFLAGS) $(OSF)                    \
-	$(call OPENGL_FLAGS) $(call use,sdl libpng) \
-	$(1) $(2) -c -o $(subst .c,.o,$(1))
+compile = $(CC) -c $(OSF) $(call flags,cflags) $(1)
 
-link = $(CC) $(CFLAGS) $(OSF)             \
-	$(call OPENGL_FLAGS) $(call use,sdl libpng) \
-	$(2) -o $(1)
+link = $(CC) $(OSL) $(call flags,libs) $(2) -o $(1)
 
 walker.o : walker.c param.h nanosec.h texture.h $(HEADER)
-	$(call compile, $<)
+	$(call compile,$<)
 
 texture.o : texture.c texture.h
-	$(call compile, $<)
+	$(call compile,$<)
 
 walker: walker.o texture.o $(OBJ)
-	$(call link, walker,$^)
+	$(call link,$@,$^)
 
 run : walker
 	./walker
@@ -59,4 +60,14 @@ note : walker
 	./walker -fs 1024 600
 
 clean :
-	rm -f walker mesh/*.{h,c,o}
+	rm -f walker *.o
+
+clean-mesh :
+	rm -f mesh/*.o
+
+clean-mesh-source :
+	rm -f mesh/*.{h,c}
+
+clean-code : clean clean-mesh
+
+mrproper : clean-codee clean-mesh-source
