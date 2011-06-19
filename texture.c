@@ -3,22 +3,11 @@
 #include <stdlib.h>
 #include <png.h>
 
-#ifdef MAC
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-
 #include "texture.h"
 
 rgba* load_png(char* filename, unsigned* width,
                unsigned* height) 
 {
-    fprintf(stderr, "   Compiled with libpng %s; using libpng %s.\n",
-        PNG_LIBPNG_VER_STRING, png_libpng_ver);
-    fprintf(stderr, "   Compiled with zlib %s; using zlib %s.\n",
-            ZLIB_VERSION, zlib_version);
-
     unsigned char header[8];
  
     FILE *fp = fopen(filename, "rb");
@@ -113,21 +102,34 @@ GLuint setup_texture(rgba* image_data, unsigned w,
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
+    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_LINEAR_MIPMAP_NEAREST);
+
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
     glTexImage2D(GL_TEXTURE_2D,0, GL_RGBA, w, h, 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) image_data);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
  
     return texture;
 }
 
-GLuint png_texture(char* filename, unsigned* w,
-                   unsigned* h)
+GLuint png_texture(char* filename)
 {
-    rgba* t = load_png(filename, w, h);
+    unsigned w, h;
 
-    return setup_texture(t, *w, *h);
+    rgba* t = load_png(filename, &w, &h);
+
+    GLuint tx = setup_texture(t, w, h);
 
     free(t);
+
+    return tx;
+}
+
+GLuint png_loadmap(char* filename, rgba* image,
+                   unsigned* w, unsigned* h)
+{
+    image = load_png(filename, w, h);
+    return setup_texture(image, *w, *h);
 }

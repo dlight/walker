@@ -55,8 +55,10 @@
 #include "gl.h"
 
 GLuint ruinas_textura, ruinas_minimap;
+rgba* ruinas_map;
+unsigned ruinas_map_x, ruinas_map_y;
 
-int res_x = 640, res_y = 480;    /* resolucao padrao */
+int res_x = 800, res_y = 600;    /* resolucao padrao */
 
 void (*desenhar_terreno)(void) = ruinasDraw;
 
@@ -74,7 +76,7 @@ void projecao_3d()
     glLoadIdentity ();
     gluPerspective(45,
                    (GLfloat) res_x /
-                   (GLfloat) res_y, 10, 10000);
+                   (GLfloat) res_y, 20, 5000);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -93,6 +95,16 @@ void posicionar_luzes()
 
     glLightfv(GL_LIGHT0, GL_POSITION, light);
     glLightfv(GL_LIGHT1, GL_POSITION, luz1);
+}
+
+void fog() {
+    if (use_fog) {
+            glClearColor (0.2, 0.2, 0.2, 0);
+            glEnable(GL_FOG);
+    }
+    else {
+        glClearColor(0, 0, 0.1, 0);
+    }
 }
 
 void terreno()
@@ -142,6 +154,8 @@ void desenhar_mundo_3d()
 {
     glEnable(GL_DEPTH_TEST);
 
+    fog();
+
     terreno();
     layer(0);
     draw_light_point();
@@ -175,7 +189,7 @@ void draw_map()
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glColor4f (0.1, 0.8, 0.95, 0.6);
+    glColor4f (0.4, 0.9, 0.95, 0.6);
 
     int size = 200;
     int m = 5;
@@ -197,10 +211,16 @@ void draw_map()
 
     glColor4f(1, 0, 0, 1);
 
+    float x = -mypos.z / 10 + 95;
+    float y = - mypos.x / 10 + 105;
+
+    //rgba q = ruinas_map[ruinas_map_y*(int)y+(int)x];
+
+    //printf("%d %d\n", (int)x, (int)y);
+
     glBegin(GL_POINTS);
 
-    glVertex2f(-mypos.z / 10 + 95,
-               - mypos.x / 10 + 105);
+    glVertex2f(x, y);
 
     glEnd();
 
@@ -231,6 +251,7 @@ void draw_status()
 
 void desenhar_mundo_2d()
 {
+    glDisable(GL_FOG);
 
     draw_map();
 
@@ -253,7 +274,8 @@ void initdraw()
 
     glMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
     glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, diffuse);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
 
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor3f (1.0, 1.0, 1.0);
@@ -286,7 +308,7 @@ void draw()
 
 void initgl()
 {
-    glClearColor (0.0, 0.0, 0.2, 0.5);
+
 
     glViewport (0, 0, res_x, res_y); 
 
@@ -314,14 +336,24 @@ void initgl()
 
     glLightfv(GL_LIGHT0, GL_DIFFUSE, luz0);
     glLightfv(GL_LIGHT0, GL_SPECULAR, luz0);
+
+
+    GLfloat fogColor[4]= {0.2, 0.2, 0.2, 1};
+
+
+    glFogi(GL_FOG_MODE, GL_EXP);
+    glFogfv(GL_FOG_COLOR, fogColor);
+    glFogf(GL_FOG_DENSITY, 0.001f);
+    glFogf(GL_FOG_START, 0);
+    glFogf(GL_FOG_END, 2000.0f);
 }
 
 void carregar_texturas()
 {
-    unsigned w, h;
+    ruinas_textura = png_texture("./mesh/ruinas.png");
 
-    ruinas_textura = png_texture("./mesh/ruinas.png", &w, &h);
-    printf("img %d, %d\n", w, h);
-    ruinas_minimap = png_texture("./mesh/ruinas_minimap.png", &w, &h);
-    printf("heightmap %d, %d\n", w, h);
+    ruinas_minimap =
+        png_loadmap("./mesh/ruinas_minimap.png",
+                    ruinas_map, &ruinas_map_x,
+                    &ruinas_map_y);
 }

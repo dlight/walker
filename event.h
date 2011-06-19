@@ -10,9 +10,11 @@ extern float light[4];
 extern float light_color[4];
 extern float shininess;
 extern float diffuse[4];
+extern float ambient[4];
 extern float specular[4];
 extern char hide_text;
-extern char use_texture;
+extern char use_texture
+;extern char use_fog;
 
 extern char fps_str[8];
 extern char status_str[3][256];

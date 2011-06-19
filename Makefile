@@ -5,7 +5,7 @@ HEADER = $(subst .obj,.h,$(wildcard mesh/*.obj))
 
 OS := $(shell uname -s)
 
-#CC = gcc -pipe -std=c99
+#CC = gcc -pipe -std=c99 -ggdb
 
 CC = clang
 

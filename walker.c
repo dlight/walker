@@ -49,6 +49,15 @@ int main(int argc, char *argv[])
     int mode = SDL_HWSURFACE | SDL_HWACCEL |
         SDL_DOUBLEBUF | SDL_OPENGL;
 
+    if (argc >= 2 && (! strcmp(argv[1], "-h") ||
+                      ! strcmp(argv[1], "--help"))) {
+        printf("Uso: %s [-fs] resolucao-x resolucao-y\n\n"
+               "Exemplo: ./walker 1024 768\n\n"
+               "Para mais informacoes, leia o README.\n",
+               argv[0]);
+        exit(0);
+    }
+
     int shift = 1;
     if (argc >= 2 && ! strcmp(argv[1], "-fs")) {
         mode |= SDL_FULLSCREEN;
@@ -64,9 +73,9 @@ int main(int argc, char *argv[])
     init_event_keys();
 
     glutInit(&argc, argv);
-
     initsdl(mode);
     initgl();
+
     carregar_texturas();
 
     SDL_Event ev;

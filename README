@@ -28,5 +28,5 @@ Para rodar:
 
 Mudar resolução, tela cheia..:
 
-  ./walker 1024 758
-  ./walker -fs 1024 758
+  ./walker 1024 768
+  ./walker -fs 1024 768

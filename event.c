@@ -55,7 +55,7 @@ float theta = -271;              /* orientacao no plano xz  */
 float phi = 0;                   /* orientacao no plano xy  */
 
 vec3 mypos =                     /* posicao do personagem   */
-    { .x = 620, .y = 42, .z = 18 };
+    { .x = 620, .y = 42, .z = 13 };
 
 float light[4] =                 /* posicao da luz 0        */
     { 0, 700, 0, 1 };
@@ -64,16 +64,19 @@ char stop_light = 0;             /* luz 0 esta parada?      */
 float light_color[4] =           /* cor da luz 1            */
     { 0.5, 0.5, 0.5, 0 };
 
-float shininess = 2;             /* brilho do material      */  
+float shininess = 0;             /* brilho do material      */  
 float diffuse[4]=                /* reflectancia difusa     */
-    { 10, 10, 10, 1 };
+    { 15, 15, 15, 1 };
+float ambient[4]=
+    { 30, 30, 30, 1 };
 float specular[4]=               /* reflectancia especular  */
-    { 2, 2, 2, 1 };
+    { 0, 0, 0, 1 };
 
 char key_pressed[512];           /* keymap continuo         */
 char key_hit[512];               /* keymap toggle           */
 
 char use_texture = 1;            /* modelo com textura?     */
+char use_fog = 1;
 
 char hide_text = 1;              /* esconder texto          */
 char grab = 1;                   /* prender mouse na janela */
@@ -177,6 +180,11 @@ void toggle()
         light_color[0] = 1;
         light_color[1] = 1;
         light_color[2] = 1;
+    }
+
+    if (key_hit['9']) {
+        key_hit['9'] = 0;
+        use_fog = !use_fog;
     }
 
     if (key_hit['0']) {
