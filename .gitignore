@@ -1,5 +1,7 @@
 /mesh/*.h
 /mesh/*.c
+/mesh/*.mtl
+/mesh/*.blend?
 
 walker
 *.o
