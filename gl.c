@@ -56,7 +56,7 @@
 
 GLuint ruinas_textura, ruinas_minimap;
 rgba* ruinas_map;
-unsigned ruinas_map_x, ruinas_map_y;
+unsigned ruinas_x, ruinas_y;
 
 int res_x = 800, res_y = 600;    /* resolucao padrao */
 
@@ -81,10 +81,36 @@ void projecao_3d()
     glLoadIdentity();
 }
 
+int f(int x, int y)
+{
+    return ruinas_map[ruinas_y*y+x].r;
+}
+
 void posicionar_camera()
 {
     glRotatef(phi, -1, 0, 0);
     glRotatef(theta, 0, -1, 0);
+
+    float xq = -mypos.z / 10 + 95;
+    float yq = mypos.x / 10 + 105;
+
+    int x = xq;
+    int y = yq;
+
+    int q[6] = { f(x-1, y), f(x, y-1), f(x-1, y-1),
+                 f(x+1, y), f(x, y+1), f(x+1, y+1) };
+
+    float p = 0;
+
+    for (int i = 0; p < 6; i++)
+        p += q[i];
+
+    //float res = f(x, y) * 0.8 + 0.2 * (p / 6);
+
+    float res = f(x, y);
+
+    if (use_heightmap)
+        mypos.y = res * 7.5 - 600;
 
     glTranslatef(-mypos.x, -mypos.y, -mypos.z);
 }
@@ -213,10 +239,6 @@ void draw_map()
 
     float x = -mypos.z / 10 + 95;
     float y = - mypos.x / 10 + 105;
-
-    //rgba q = ruinas_map[ruinas_map_y*(int)y+(int)x];
-
-    //printf("%d %d\n", (int)x, (int)y);
 
     glBegin(GL_POINTS);
 
@@ -354,6 +376,6 @@ void carregar_texturas()
 
     ruinas_minimap =
         png_loadmap("./mesh/ruinas_minimap.png",
-                    ruinas_map, &ruinas_map_x,
-                    &ruinas_map_y);
+                    &ruinas_map, &ruinas_x,
+                    &ruinas_y);
 }

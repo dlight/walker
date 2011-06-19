@@ -75,13 +75,15 @@ float specular[4]=               /* reflectancia especular  */
 char key_pressed[512];           /* keymap continuo         */
 char key_hit[512];               /* keymap toggle           */
 
-char use_texture = 1;            /* modelo com textura?     */
+char use_texture = 1;            /* usar modelo com textura */
 char use_fog = 1;
 
 char hide_text = 1;              /* esconder texto          */
 char grab = 1;                   /* prender mouse na janela */
 
-char fps_str[8] = "O FPS";       /* fps na tela             */
+char use_heightmap = 1;          /* usar mapa de altura */
+
+char fps_str[8] = "0 FPS";       /* fps na tela             */
 char status_str[3][256];         /* variaveis na tela       */
 
 void init_event_keys()
@@ -180,6 +182,11 @@ void toggle()
         light_color[0] = 1;
         light_color[1] = 1;
         light_color[2] = 1;
+    }
+
+    if (key_hit['8']) {
+        key_hit['8'] = 0;
+        use_heightmap = !use_heightmap;
     }
 
     if (key_hit['9']) {

@@ -20,7 +20,7 @@ GLuint setup_texture(rgba* image_data, unsigned w,
                      unsigned h);
 GLuint png_texture(char* filename);
 
-GLuint png_loadmap(char* filename, rgba* image,
+GLuint png_loadmap(char* filename, rgba** image,
                    unsigned* w, unsigned* h);
 
 #endif
