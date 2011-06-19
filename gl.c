@@ -155,18 +155,17 @@ void linhas ()
 
     glBegin(GL_LINES);
 
-    for (int i = -70; i < 71; i++) {
-        glVertex3f(10*i, 0, 700);
-        glVertex3f(10*i, 0, -700);
+    int n = 15;
+
+    for (int i = -n; i < n+1; i++) {
+        glVertex3f(10*i, 0, n*10);
+        glVertex3f(10*i, 0, -n*10);
+        glVertex3f(n*10, 0, 10*i);
+        glVertex3f(-n*10, 0, 10*i);
     }
 
-    for (int i = -70; i < 71; i++) {
-        glVertex3f(700, 0, 10*i);
-        glVertex3f(-700, 0, 10*i);
-    }
-
-        glVertex3f(0, 700, 0);
-        glVertex3f(0, -700, 0);
+    glVertex3f(0, n*10, 0);
+    glVertex3f(0, -n*10, 0);
 
     glEnd();
 
