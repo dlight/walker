@@ -76,7 +76,7 @@ void projecao_3d()
     glLoadIdentity ();
     gluPerspective(45,
                    (GLfloat) res_x /
-                   (GLfloat) res_y, 20, 5000);
+                   (GLfloat) res_y, 1, 2000);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -155,18 +155,18 @@ void linhas ()
 
     glBegin(GL_LINES);
 
-    for (int i = -10; i < 11; i++) {
-        glVertex3f(100*i, 0, -1000);
-        glVertex3f(100*i, 0, 1000);
+    for (int i = -70; i < 71; i++) {
+        glVertex3f(10*i, 0, 700);
+        glVertex3f(10*i, 0, -700);
     }
 
-    for (int i = -10; i < 11; i++) {
-        glVertex3f(1000, 0, 100*i);
-        glVertex3f(-1000, 0, 100*i);
+    for (int i = -70; i < 71; i++) {
+        glVertex3f(700, 0, 10*i);
+        glVertex3f(-700, 0, 10*i);
     }
 
-        glVertex3f(0, 1000, 0);
-        glVertex3f(0, -1000, 0);
+        glVertex3f(0, 700, 0);
+        glVertex3f(0, -700, 0);
 
     glEnd();
 
