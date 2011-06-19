@@ -169,6 +169,30 @@ void layer(float posz)
     glDisable(GL_LIGHTING);
 }
 
+void linhas ()
+{
+    glPushMatrix();
+
+    glBegin(GL_LINES);
+
+    for (int i = -10; i < 11; i++) {
+        glVertex3f(100*i, 0, -1000);
+        glVertex3f(100*i, 0, 1000);
+    }
+
+    for (int i = -10; i < 11; i++) {
+        glVertex3f(1000, 0, 100*i);
+        glVertex3f(-1000, 0, 100*i);
+    }
+
+        glVertex3f(0, 1000, 0);
+        glVertex3f(0, -1000, 0);
+
+    glEnd();
+
+    glPopMatrix();
+}
+
 void draw_light_point()
 {
     glBegin(GL_POINTS);
@@ -182,8 +206,8 @@ void desenhar_mundo_3d()
 
     fog();
 
+    linhas();
     terreno();
-    layer(0);
     draw_light_point();
 
     glDisable(GL_DEPTH_TEST);

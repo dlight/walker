@@ -51,11 +51,11 @@
 float vel = 250;                 /* velocidade linear       */
 float ang_vel = 0.2 ;            /* velocidade angular      */
 
-float theta = -271;              /* orientacao no plano xz  */
+float theta = 0;                 /* orientacao no plano xz  */
 float phi = 0;                   /* orientacao no plano xy  */
 
 vec3 mypos =                     /* posicao do personagem   */
-    { .x = 620, .y = 42, .z = 13 };
+    { .x = 0, .y = 0, .z = 0 };
 
 float light[4] =                 /* posicao da luz 0        */
     { 0, 700, 0, 1 };
@@ -76,12 +76,13 @@ char key_pressed[512];           /* keymap continuo         */
 char key_hit[512];               /* keymap toggle           */
 
 char use_texture = 1;            /* usar modelo com textura */
-char use_fog = 1;
+char use_fog = 0;
 
 char hide_text = 1;              /* esconder texto          */
 char grab = 1;                   /* prender mouse na janela */
+char realce_grid = 1;
 
-char use_heightmap = 1;          /* usar mapa de altura */
+char use_heightmap = 0;          /* usar mapa de altura */
 
 char fps_str[8] = "0 FPS";       /* fps na tela             */
 char status_str[3][256];         /* variaveis na tela       */
@@ -182,6 +183,11 @@ void toggle()
         light_color[0] = 1;
         light_color[1] = 1;
         light_color[2] = 1;
+    }
+
+    if (key_hit['7']) {
+        key_hit['7'] = 0;
+        realce_grid = !realce_grid;
     }
 
     if (key_hit['8']) {

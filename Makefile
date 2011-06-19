@@ -19,7 +19,7 @@ all : walker
 	@echo para mais informacoes leia o README
 
 mesh/%.c mesh/%.h : mesh/%.obj
-	./tools/obj2opengl.pl -scale 1 $<
+	./tools/obj2opengl.pl -noScale -noMove $<
 
 mesh/%.o : mesh/%.c
 	$(CC) -pipe -c -o $@ $<
