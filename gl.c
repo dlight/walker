@@ -190,6 +190,8 @@ void desenhar_mundo_3d()
     terreno();
     draw_light_point();
 
+    glDisable(GL_FOG);
+
     glDisable(GL_DEPTH_TEST);
 }
 
@@ -260,6 +262,8 @@ void draw_map()
 
 void draw_status()
 {
+    if (!hide_text)
+        return;
 
     glColor3f(1, 1, 1);
     glRasterPos2i(10, 10);
@@ -280,12 +284,8 @@ void draw_status()
 
 void desenhar_mundo_2d()
 {
-    glDisable(GL_FOG);
-
     draw_map();
-
-    if (!hide_text)
-        draw_status();
+    draw_status();
 }
 
 
