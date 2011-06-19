@@ -80,7 +80,8 @@ char use_fog = 0;
 
 char hide_text = 1;              /* esconder texto          */
 char grab = 1;                   /* prender mouse na janela */
-char realce_grid = 1;
+char show_grid = 1;
+char show_map = 1;
 
 char use_heightmap = 0;          /* usar mapa de altura */
 
@@ -185,9 +186,14 @@ void toggle()
         light_color[2] = 1;
     }
 
+    if (key_hit['6']) {
+        key_hit['6'] = 0;
+        show_map = !show_map;
+    }
+
     if (key_hit['7']) {
         key_hit['7'] = 0;
-        realce_grid = !realce_grid;
+        show_grid = !show_grid;
     }
 
     if (key_hit['8']) {

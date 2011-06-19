@@ -146,31 +146,11 @@ void terreno()
     glDisable(GL_LIGHTING);
 }
 
-void cubep(float posx, float posy, float posz)
-{
-    glPushMatrix();
-    glTranslatef(posx, posy, posz);
-    glutSolidCube (1.0);
-    glPopMatrix();
-}
-
-void layer(float posz)
-{
-    glEnable(GL_LIGHTING);
-
-    cubep(2, 2, posz);
-
-    int i;
-    for (i = 0; i < 30; i+=2) {
-        cubep(i, 0, posz);
-        cubep(i, 2, posz);
-    }
-
-    glDisable(GL_LIGHTING);
-}
-
 void linhas ()
 {
+    if (!show_grid)
+        return;
+
     glPushMatrix();
 
     glBegin(GL_LINES);
@@ -233,6 +213,9 @@ void projecao_2d()
 
 void draw_map()
 {
+    if (!show_map)
+        return;
+
     glEnable(GL_TEXTURE_2D);
 
     glBindTexture(GL_TEXTURE_2D, ruinas_minimap);

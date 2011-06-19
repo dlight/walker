@@ -17,7 +17,8 @@ extern char use_texture;
 extern char use_fog;
 extern char use_heightmap;
 
-extern char realce_grid;
+extern char show_grid;
+extern char show_map;
 
 extern char fps_str[8];
 extern char status_str[3][256];
