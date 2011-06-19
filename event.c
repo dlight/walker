@@ -155,76 +155,63 @@ void event_handler(SDL_Event ev)
     };
 }
 
+#define LIDAR_COM_TECLA(tecla, acao) \
+    {     if (key_hit[tecla]) { \
+        key_hit[tecla] = 0;     \
+        acao;                   \
+        }                       \
+    }
+
+#define TECLA_TOGGLE(tecla, variavel) \
+    LIDAR_COM_TECLA(tecla, { variavel = ! variavel; })
+
 void toggle()
 {
-    if (key_hit[SDLK_F2]) {
-        key_hit[SDLK_F2] = 0;
-            SDL_WM_GrabInput(SDL_GRAB_OFF);
-            SDL_ShowCursor(SDL_ENABLE);
-            grab = 0;
-    }
+    TECLA_TOGGLE('p', stop_light);
 
-    if (key_hit['p']) {
-        key_hit['p'] = 0;
-        stop_light = ! stop_light;
-    }
-    if (key_hit['o']) {
-        key_hit['o'] = 0;
-        hide_text = ! hide_text;
-    }
+    TECLA_TOGGLE('o', hide_text);
+    TECLA_TOGGLE('6', show_map);
+    TECLA_TOGGLE('7', show_grid);
+    TECLA_TOGGLE('8', use_heightmap);
+    TECLA_TOGGLE('9', use_fog);
+    TECLA_TOGGLE('0', use_texture);
 
-    if (key_hit['j']) {
-        key_hit['j'] = 0;
-        light_color[0] = 0.8;
-        light_color[1] = 1;
-        light_color[2] = 0.8;
-    }
-    if (key_hit['k']) {
-        key_hit['k'] = 0;
-        light_color[0] = 1;
-        light_color[1] = 1;
-        light_color[2] = 1;
-    }
+    LIDAR_COM_TECLA(SDLK_F2,
+                    {
+                        SDL_WM_GrabInput(SDL_GRAB_OFF);
+                        SDL_ShowCursor(SDL_ENABLE);
+                        grab = 0;
+                    });
 
-    if (key_hit['6']) {
-        key_hit['6'] = 0;
-        show_map = !show_map;
-    }
+    LIDAR_COM_TECLA('j',
+                    {
+                        light_color[0] = 0.8;
+                        light_color[1] = 1;
+                        light_color[2] = 0.8;
+                    });
 
-    if (key_hit['7']) {
-        key_hit['7'] = 0;
-        show_grid = !show_grid;
-    }
+    LIDAR_COM_TECLA('k',
+                    {
+                        light_color[0] = 1;
+                        light_color[1] = 1;
+                        light_color[2] = 1;
+                    });
 
-    if (key_hit['8']) {
-        key_hit['8'] = 0;
-        use_heightmap = !use_heightmap;
-    }
+    LIDAR_COM_TECLA('-',
+                    {
+                        if (glIsEnabled(GL_LIGHT0))
+                            glDisable(GL_LIGHT0);
+                        else
+                            glEnable(GL_LIGHT0);
+                    });
 
-    if (key_hit['9']) {
-        key_hit['9'] = 0;
-        use_fog = !use_fog;
-    }
-
-    if (key_hit['0']) {
-        key_hit['0'] = 0;
-        use_texture = !use_texture;
-    }
-
-    if (key_hit['-']) {
-        key_hit['-'] = 0;
-        if (glIsEnabled(GL_LIGHT0))
-            glDisable(GL_LIGHT0);
-        else
-            glEnable(GL_LIGHT0);
-    }
-    if (key_hit['=']) {
-        key_hit['='] = 0;
-        if (glIsEnabled(GL_LIGHT1))
-            glDisable(GL_LIGHT1);
-        else
-            glEnable(GL_LIGHT1);
-    }
+    LIDAR_COM_TECLA('=',
+                    {
+                        if (glIsEnabled(GL_LIGHT1))
+                            glDisable(GL_LIGHT1);
+                        else
+                            glEnable(GL_LIGHT1);
+                    });
 }
 
 void model(float dt)
