@@ -48,7 +48,9 @@
 #include "types.h"
 #include "event.h"
 
-float vel = 250;                 /* velocidade linear       */
+#define KM_H (1000.f / 3600.f)
+
+float vel = 10 * KM_H;           /* velocidade linear, km/h */
 float ang_vel = 0.2 ;            /* velocidade angular      */
 
 float theta = 0;                 /* orientacao no plano xz  */
@@ -83,7 +85,9 @@ char grab = 1;                   /* prender mouse na janela */
 char show_grid = 1;
 char show_map = 1;
 
-char use_heightmap = 0;          /* usar mapa de altura */
+char use_heightmap = 0;          /* usar mapa de altura     */
+
+float minha_altura = 1.7;        /* em metros               */
 
 char fps_str[8] = "0 FPS";       /* fps na tela             */
 char status_str[3][256];         /* variaveis na tela       */
@@ -97,9 +101,9 @@ void init_event_keys()
 
 void update_status_str()
 {
-    snprintf(status_str[0], 256, "v%f p(% 9.3f,% 7.3f,% 9.3f) "
+    snprintf(status_str[0], 256, "v%.2f h%.3f p(% 9.3f,% 7.3f,% 9.3f) "
              "a(% 6.1f,%5.1f)",
-             vel, mypos.x, mypos.y, mypos.z,
+             vel, minha_altura, mypos.x, mypos.y, mypos.z,
              theta, phi);
 
 
@@ -216,7 +220,7 @@ void toggle()
 
 void model(float dt)
 {
-    float vel_vel = 500;
+    float vel_vel = 1;
 
     float color_vel = 0.8;
     float param_vel = 100;
@@ -294,10 +298,11 @@ void physics(float dt)
     float vel_cos = vel * cos(rad * theta) * dt;
 
     if (key_pressed['q']) {
-        mypos.y += vel * dt;
+        minha_altura += vel * dt;
+        printf("%f\n", minha_altura);
     }
     if (key_pressed['e']) {
-        mypos.y -= vel * dt;
+        minha_altura -= vel * dt;
     }
 
     if (key_pressed['w']) {

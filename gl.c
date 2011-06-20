@@ -112,7 +112,7 @@ void posicionar_camera()
     if (use_heightmap)
         mypos.y = res * 7.5 - 600;
 
-    glTranslatef(-mypos.x, -mypos.y, -mypos.z);
+    glTranslatef(-mypos.x, -mypos.y - minha_altura, -mypos.z);
 }
 
 void posicionar_luzes()

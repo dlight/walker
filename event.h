@@ -23,6 +23,8 @@ extern char show_map;
 extern char fps_str[8];
 extern char status_str[3][256];
 
+extern float minha_altura;
+
 void init_event_keys();
 void update_status_str();
 void update_fps_str();
