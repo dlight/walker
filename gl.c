@@ -55,8 +55,6 @@
 #include "gl.h"
 
 GLuint ruinas_textura, ruinas_minimap;
-rgba* ruinas_map;
-unsigned ruinas_x, ruinas_y;
 
 int res_x = 800, res_y = 600;    /* resolucao padrao */
 
@@ -81,38 +79,18 @@ void projecao_3d()
     glLoadIdentity();
 }
 
-int f(int x, int y)
-{
-    return ruinas_map[ruinas_y*y+x].r;
-}
 
 void posicionar_camera()
 {
     glRotatef(phi, -1, 0, 0);
     glRotatef(theta, 0, -1, 0);
 
-    float xq = -mypos.z / 10 + 95;
-    float yq = mypos.x / 10 + 105;
-
-    int x = xq;
-    int y = yq;
-
-    int q[6] = { f(x-1, y), f(x, y-1), f(x-1, y-1),
-                 f(x+1, y), f(x, y+1), f(x+1, y+1) };
-
-    float p = 0;
-
-    for (int i = 0; p < 6; i++)
-        p += q[i];
-
-    //float res = f(x, y) * 0.8 + 0.2 * (p / 6);
-
-    float res = f(x, y);
+    mypos.y = minha_altura;
 
     if (use_heightmap)
-        mypos.y = res * 7.5 - 600;
+        mypos.y += ((float)altura_terreno / 256.) * 60.653 - 20.849;
 
-    glTranslatef(-mypos.x, -mypos.y - minha_altura, -mypos.z);
+    glTranslatef(-mypos.x, -mypos.y, -mypos.z);
 }
 
 void posicionar_luzes()
@@ -225,20 +203,22 @@ void draw_map()
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glColor4f (0.4, 0.9, 0.95, 0.6);
+    glColor4f (1, 0.7, 1, 0.7);
 
-    int size = 200;
-    int m = 5;
+    int m = 0;
+
+    unsigned l = screen_map_len;
 
     glPushMatrix();
-    glTranslated(res_x - size - m, res_y - size - m, 0);
+    glTranslated(res_x - l - m,
+                 res_y - l - m, 0);
 
     glBegin(GL_QUADS);
 
     glTexCoord2f(0, 1);    glVertex2i(0, 0);
-    glTexCoord2f(1, 1);    glVertex2i(size, 0);
-    glTexCoord2f(1, 0);    glVertex2i(size, size);
-    glTexCoord2f(0, 0);    glVertex2i(0, size);
+    glTexCoord2f(1, 1);    glVertex2i(l, 0);
+    glTexCoord2f(1, 0);    glVertex2i(l, l);
+    glTexCoord2f(0, 0);    glVertex2i(0, l);
 
     glEnd();
 
@@ -247,14 +227,11 @@ void draw_map()
 
     glColor4f(1, 0, 0, 1);
 
-    float x = -mypos.z / 10 + 95;
-    float y = - mypos.x / 10 + 105;
-
     glPointSize(2);
 
     glBegin(GL_POINTS);
 
-    glVertex2f(x, y);
+    glVertex2f(map_pos_u, map_pos_v);
 
     glEnd();
 
@@ -390,6 +367,6 @@ void carregar_texturas()
 
     ruinas_minimap =
         png_loadmap("./mesh/ruinas_map.png",
-                    &ruinas_map, &ruinas_x,
-                    &ruinas_y);
+                    &ruinas_map, &map_len_u,
+                    &map_len_v);
 }

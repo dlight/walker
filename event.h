@@ -25,7 +25,20 @@ extern char wireframe;
 extern char fps_str[8];
 extern char status_str[3][256];
 
+extern float map_pos_u;
+extern float map_pos_v;
+extern unsigned map_len_u;
+extern unsigned map_len_v;
+
+extern unsigned screen_map_len;
+
+extern rgba* ruinas_map;
+
 extern float minha_altura;
+
+extern int altura_terreno;
+
+void update_map_pos();
 
 void init_event_keys();
 void update_status_str();

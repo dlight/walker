@@ -50,7 +50,7 @@
 
 #define KM_H (1000.f / 3600.f)
 
-float vel = 10 * KM_H;           /* velocidade linear, km/h */
+float vel = 200 * KM_H;          /* velocidade linear, km/h */
 float ang_vel = 0.2 ;            /* velocidade angular      */
 
 float theta = 0;                 /* orientacao no plano xz  */
@@ -91,8 +91,37 @@ char use_heightmap = 0;          /* usar mapa de altura     */
 
 float minha_altura = 1.7;        /* em metros               */
 
+float pos_map_x;
+float pos_map_y;
+
 char fps_str[8] = "0 FPS";       /* fps na tela             */
 char status_str[3][256];         /* variaveis na tela       */
+
+float map_pos_u;
+float map_pos_v;
+unsigned map_len_u;
+unsigned map_len_v;
+
+int altura_terreno;
+
+unsigned screen_map_len = 300;
+
+
+rgba* ruinas_map;
+
+void update_map_pos()
+{
+    float l = ((float) screen_map_len) / 2;
+    map_pos_u = mypos.x * (screen_map_len / 118.729) + 150;
+    map_pos_v =-mypos.z * (screen_map_len / 115.937) + 150;
+
+    float pu = mypos.x + ((float)map_len_u) / 2;
+    float pv = mypos.z + ((float)map_len_v) / 2;
+
+    int i = (int) pv * map_len_v + (int)pu;
+
+    altura_terreno = ruinas_map[i].r;
+}
 
 void init_event_keys()
 {
@@ -103,9 +132,11 @@ void init_event_keys()
 
 void update_status_str()
 {
-    snprintf(status_str[0], 256, "v%.2f h%.3f p(% 9.3f,% 7.3f,% 9.3f) "
-             "a(% 6.1f,%5.1f)",
-             vel, minha_altura, mypos.x, mypos.y, mypos.z,
+    snprintf(status_str[0], 256, "v%.2f h%.3f t %d u %.2f v "
+             "%.2f p(% 9.3f,% 7.3f,% 9.3f) "
+             "a(% 6.1f,%5.1f)", vel, minha_altura,
+             altura_terreno, map_pos_u, map_pos_v,
+             mypos.x, mypos.y, mypos.z,
              theta, phi);
 
 

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <png.h>
 
+#include "types.h"
 #include "texture.h"
 
 rgba* load_png(char* filename, unsigned* width,

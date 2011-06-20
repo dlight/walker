@@ -113,6 +113,7 @@ int main(int argc, char *argv[])
         old_time = new_time;
         count++;
 
+        update_map_pos();
         update_status_str();
 
         toggle();
