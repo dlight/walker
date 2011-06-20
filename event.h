@@ -20,6 +20,8 @@ extern char use_heightmap;
 extern char show_grid;
 extern char show_map;
 
+extern char wireframe;
+
 extern char fps_str[8];
 extern char status_str[3][256];
 

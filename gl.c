@@ -74,7 +74,7 @@ void projecao_3d()
 {
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    gluPerspective(45,
+    gluPerspective(60,
                    (GLfloat) res_x /
                    (GLfloat) res_y, 1, 2000);
     glMatrixMode (GL_MODELVIEW);
@@ -174,6 +174,7 @@ void linhas ()
 
 void draw_light_point()
 {
+    glPointSize(1);
     glBegin(GL_POINTS);
     glVertex3f(light[0], light[1], light[2]);
     glEnd();
@@ -217,6 +218,7 @@ void draw_map()
     if (!show_map)
         return;
 
+    glPolygonMode(GL_FRONT, GL_FILL);
     glEnable(GL_TEXTURE_2D);
 
     glBindTexture(GL_TEXTURE_2D, ruinas_minimap);
@@ -248,6 +250,8 @@ void draw_map()
     float x = -mypos.z / 10 + 95;
     float y = - mypos.x / 10 + 105;
 
+    glPointSize(2);
+
     glBegin(GL_POINTS);
 
     glVertex2f(x, y);
@@ -257,6 +261,9 @@ void draw_map()
     glPopMatrix();
 
     glDisable(GL_TEXTURE_2D);
+
+    if (wireframe)
+        glPolygonMode(GL_FRONT, GL_LINE);
 }
 
 void draw_status()
@@ -297,6 +304,11 @@ void desenhar_mundo_2d()
 
 void initdraw()
 {
+    if (wireframe)
+        glPolygonMode(GL_FRONT, GL_LINE);
+    else
+        glPolygonMode(GL_FRONT, GL_FILL);
+
     glLightfv(GL_LIGHT1, GL_DIFFUSE, light_color);
     glLightfv(GL_LIGHT1, GL_SPECULAR, light_color);
 
@@ -343,24 +355,20 @@ void initgl()
     glShadeModel(GL_SMOOTH);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    glPointSize(1.5);
-
     glEnable(GL_CULL_FACE);
     
-    float ambient[]={ 0.005, 0.005, 0.005, 0 };
+    float ambient[]={ 0.1, 0.1, 0.1, 0 };
 
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
 
-    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
+    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.001);
     glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.0001);
 
     glEnable(GL_LIGHT1);
 
-    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.05);
+    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.1);
 
-    float luz0[]={ 3, 3, 3, 1 };
+    float luz0[]={ 10, 10, 10, 1 };
 
     glLightfv(GL_LIGHT0, GL_DIFFUSE, luz0);
     glLightfv(GL_LIGHT0, GL_SPECULAR, luz0);
@@ -371,9 +379,9 @@ void initgl()
 
     glFogi(GL_FOG_MODE, GL_EXP);
     glFogfv(GL_FOG_COLOR, fogColor);
-    glFogf(GL_FOG_DENSITY, 0.001f);
+    glFogf(GL_FOG_DENSITY, 0.05f);
     glFogf(GL_FOG_START, 0);
-    glFogf(GL_FOG_END, 2000.0f);
+    glFogf(GL_FOG_END, 300.0f);
 }
 
 void carregar_texturas()
@@ -381,7 +389,7 @@ void carregar_texturas()
     ruinas_textura = png_texture("./mesh/ruinas.png");
 
     ruinas_minimap =
-        png_loadmap("./mesh/ruinas_minimap.png",
+        png_loadmap("./mesh/ruinas_map.png",
                     &ruinas_map, &ruinas_x,
                     &ruinas_y);
 }

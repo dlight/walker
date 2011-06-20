@@ -102,14 +102,13 @@ GLuint setup_texture(rgba* image_data, unsigned w,
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_LINEAR_MIPMAP_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                    GL_LINEAR_MIPMAP_NEAREST);
+                    GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D,0, GL_RGBA, w, h, 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) image_data);
+    gluBuild2DMipmaps( GL_TEXTURE_2D, 4, w, h,
+                       GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) image_data );
 
     return texture;
 }

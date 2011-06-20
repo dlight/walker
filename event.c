@@ -68,9 +68,9 @@ float light_color[4] =           /* cor da luz 1            */
 
 float shininess = 0;             /* brilho do material      */  
 float diffuse[4]=                /* reflectancia difusa     */
-    { 15, 15, 15, 1 };
+    { 1, 1, 1, 1 };
 float ambient[4]=
-    { 30, 30, 30, 1 };
+    { 1, 1, 1, 1 };
 float specular[4]=               /* reflectancia especular  */
     { 0, 0, 0, 1 };
 
@@ -78,12 +78,14 @@ char key_pressed[512];           /* keymap continuo         */
 char key_hit[512];               /* keymap toggle           */
 
 char use_texture = 1;            /* usar modelo com textura */
-char use_fog = 0;
+char use_fog = 1;
 
 char hide_text = 1;              /* esconder texto          */
 char grab = 1;                   /* prender mouse na janela */
 char show_grid = 1;
 char show_map = 1;
+
+char wireframe = 0;
 
 char use_heightmap = 0;          /* usar mapa de altura     */
 
@@ -174,6 +176,7 @@ void toggle()
     TECLA_TOGGLE('p', stop_light);
 
     TECLA_TOGGLE('o', hide_text);
+    TECLA_TOGGLE('5', wireframe);
     TECLA_TOGGLE('6', show_map);
     TECLA_TOGGLE('7', show_grid);
     TECLA_TOGGLE('8', use_heightmap);
