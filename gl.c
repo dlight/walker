@@ -51,10 +51,11 @@
 #include "event.h"
 
 #include "mesh/ruinas.h"
+#include "mesh/sky.h"
 
 #include "gl.h"
 
-GLuint ruinas_textura, ruinas_minimap;
+GLuint ruinas_textura, ruinas_minimap, sky_textura;
 
 int res_x = 800, res_y = 600;    /* resolucao padrao */
 
@@ -78,7 +79,6 @@ void projecao_3d()
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
 }
-
 
 void posicionar_camera()
 {
@@ -109,6 +109,21 @@ void fog() {
     else {
         glClearColor(0, 0, 0.1, 0);
     }
+}
+
+void sky()
+{
+	//glColor4f(1, 1, 1, 1);
+	//glScalef(100, 100, 100);
+//    glEnable(GL_LIGHTING);
+    if (use_texture)
+        glEnable(GL_TEXTURE_2D);
+	
+    glBindTexture(GL_TEXTURE_2D, sky_textura);
+    skyDraw();
+	
+    //glDisable(GL_TEXTURE_2D);
+//    glDisable(GL_LIGHTING);
 }
 
 void terreno()
@@ -164,11 +179,12 @@ void desenhar_mundo_3d()
 
     fog();
 
+
     linhas();
     terreno();
     draw_light_point();
-
-    glDisable(GL_FOG);
+	    glDisable(GL_FOG);
+	sky();
 
     glDisable(GL_DEPTH_TEST);
 }
@@ -369,4 +385,6 @@ void carregar_texturas()
         png_loadmap("./mesh/ruinas_map.png",
                     &ruinas_map, &map_len_u,
                     &map_len_v);
+	
+	sky_textura = png_texture("./mesh/sky.png");
 }
