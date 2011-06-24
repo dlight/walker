@@ -50,7 +50,7 @@
 
 #define KM_H (1000.f / 3600.f)
 
-float vel = 200 * KM_H;          /* velocidade linear, km/h */
+float vel = 60 * KM_H;           /* velocidade linear, km/h */
 float ang_vel = 0.2 ;            /* velocidade angular      */
 
 float theta = 0;                 /* orientacao no plano xz  */
@@ -87,7 +87,7 @@ char show_map = 1;
 
 char wireframe = 0;
 
-char use_heightmap = 0;          /* usar mapa de altura     */
+char use_heightmap = 1;          /* usar mapa de altura     */
 
 float minha_altura = 1.7;        /* em metros               */
 
@@ -104,21 +104,30 @@ unsigned map_len_v;
 
 int altura_terreno;
 
-unsigned screen_map_len = 300;
+unsigned screen_map_len = 200;
 
+int iu, iv;
 
 rgba* ruinas_map;
 
 void update_map_pos()
 {
-    float l = ((float) screen_map_len) / 2;
-    map_pos_u = mypos.x * (screen_map_len / 118.729) + 150;
-    map_pos_v =-mypos.z * (screen_map_len / 115.937) + 150;
+    // z (blender x) 100m
+    // x (blender y) 100m
 
-    float pu = mypos.x + ((float)map_len_u) / 2;
-    float pv = mypos.z + ((float)map_len_v) / 2;
+    float ratio = (float) screen_map_len / 100;
+    float half = screen_map_len / 2;
 
-    int i = (int) pv * map_len_v + (int)pu;
+    map_pos_u = mypos.x * ratio + half;
+    map_pos_v =-mypos.z * ratio + half;
+
+    float mu = (float) map_len_u / screen_map_len;
+    float mv = (float) map_len_v / screen_map_len;
+
+    iu = map_pos_u * mu;
+    iv = map_pos_v * mv;
+
+    int i = (map_len_v - iv) * map_len_v + iu;
 
     altura_terreno = ruinas_map[i].r;
 }
@@ -133,9 +142,9 @@ void init_event_keys()
 void update_status_str()
 {
     snprintf(status_str[0], 256, "v%.2f h%.3f t %d u %.2f v "
-             "%.2f p(% 9.3f,% 7.3f,% 9.3f) "
-             "a(% 6.1f,%5.1f)", vel, minha_altura,
-             altura_terreno, map_pos_u, map_pos_v,
+             "%.2f iu %d iv %d p(% 9.3f,% 7.3f,% 9.3f) "
+             "(% 6.1f,%5.1f)", vel, minha_altura,
+             altura_terreno, map_pos_u, map_pos_v, iu, iv,
              mypos.x, mypos.y, mypos.z,
              theta, phi);
 
@@ -355,6 +364,16 @@ void physics(float dt)
         mypos.x += vel_cos;
         mypos.z -= vel_sin;
     }
+
+    if (mypos.x >= 50)
+        mypos.x = 50;
+    if (mypos.x <= -50)
+        mypos.x = -50;
+    if (mypos.z >= 50)
+        mypos.z = 50;
+    if (mypos.z <= -50)
+        mypos.z = -50;
+
 
     float ang_vel_light = 1000;
 

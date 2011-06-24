@@ -74,7 +74,7 @@ void projecao_3d()
     glLoadIdentity ();
     gluPerspective(60,
                    (GLfloat) res_x /
-                   (GLfloat) res_y, 1, 2000);
+                   (GLfloat) res_y, 0.01, 500);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -103,7 +103,7 @@ void posicionar_luzes()
 
 void fog() {
     if (use_fog) {
-            glClearColor (0.2, 0.2, 0.2, 0);
+            glClearColor (0.3, 0.3, 0.3, 0);
             glEnable(GL_FOG);
     }
     else {
@@ -201,11 +201,11 @@ void draw_map()
 
     glBindTexture(GL_TEXTURE_2D, ruinas_minimap);
     glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc (GL_SRC_ALPHA, GL_SRC_ALPHA);
 
-    glColor4f (1, 0.7, 1, 0.7);
+    glColor4f (0.3, 0.9, 1, 1);
 
-    int m = 0;
+    int m = 5;
 
     unsigned l = screen_map_len;
 
@@ -351,7 +351,7 @@ void initgl()
     glLightfv(GL_LIGHT0, GL_SPECULAR, luz0);
 
 
-    GLfloat fogColor[4]= {0.2, 0.2, 0.2, 1};
+    GLfloat fogColor[4]= {0.3, 0.3, 0.3, 1};
 
 
     glFogi(GL_FOG_MODE, GL_EXP);
