@@ -366,14 +366,14 @@ void physics(float dt)
         mypos.z -= vel_sin;
     }
 
-    if (mypos.x >= 50)
-        mypos.x = 50;
-    if (mypos.x <= -50)
-        mypos.x = -50;
-    if (mypos.z >= 50)
-        mypos.z = 50;
-    if (mypos.z <= -50)
-        mypos.z = -50;
+    if (mypos.x >= 49)
+        mypos.x = 49;
+    if (mypos.x <= -49)
+        mypos.x = -49;
+    if (mypos.z >= 49)
+        mypos.z = 49;
+    if (mypos.z <= -49)
+        mypos.z = -49;
 
 
     float ang_vel_light = 1000;
