@@ -113,17 +113,15 @@ void fog() {
 
 void sky()
 {
-	//glColor4f(1, 1, 1, 1);
-	//glScalef(100, 100, 100);
-//    glEnable(GL_LIGHTING);
+    if (!use_sky)
+        return;
     if (use_texture)
         glEnable(GL_TEXTURE_2D);
 	
     glBindTexture(GL_TEXTURE_2D, sky_textura);
     skyDraw();
-	
-    //glDisable(GL_TEXTURE_2D);
-//    glDisable(GL_LIGHTING);
+
+    glDisable(GL_TEXTURE_2D);
 }
 
 void terreno()

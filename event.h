@@ -16,6 +16,7 @@ extern char hide_text;
 extern char use_texture;
 extern char use_fog;
 extern char use_heightmap;
+extern char use_sky;
 
 extern char show_grid;
 extern char show_map;

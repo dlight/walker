@@ -88,6 +88,7 @@ char show_map = 1;
 char wireframe = 0;
 
 char use_heightmap = 1;          /* usar mapa de altura     */
+char use_sky = 1;                /* mostrar ceu             */
 
 float minha_altura = 1.7;        /* em metros               */
 
@@ -216,6 +217,7 @@ void toggle()
     TECLA_TOGGLE('p', stop_light);
 
     TECLA_TOGGLE('o', hide_text);
+    TECLA_TOGGLE('4', use_sky);
     TECLA_TOGGLE('5', wireframe);
     TECLA_TOGGLE('6', show_map);
     TECLA_TOGGLE('7', show_grid);
