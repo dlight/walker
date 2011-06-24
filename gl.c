@@ -191,19 +191,43 @@ void projecao_2d()
     glLoadIdentity();
 }
 
+void direcao()
+{
+    glPushMatrix();
+
+    glRotatef(theta, 0, 0, 1);
+
+    
+
+    glBegin(GL_TRIANGLES);
+
+    glColor4f(0, 1, 0, 0.1);
+
+    glVertex2f(-5, 15);
+
+    glColor4f(0, 1, 0, 0.4);
+    glVertex2f(0, 0);
+
+    glColor4f(0, 1, 0, 0.1);
+    glVertex2f(5, 15);
+
+    glEnd();
+
+    glPopMatrix();
+}
+
 void draw_map()
 {
     if (!show_map)
         return;
 
     glPolygonMode(GL_FRONT, GL_FILL);
-    glEnable(GL_TEXTURE_2D);
 
     glBindTexture(GL_TEXTURE_2D, ruinas_minimap);
     glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_SRC_ALPHA);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glColor4f (0.3, 0.9, 1, 1);
+    glColor4f (0.5, 0.8, 1, 0.6);
 
     int m = 5;
 
@@ -213,6 +237,8 @@ void draw_map()
     glTranslated(res_x - l - m,
                  res_y - l - m, 0);
 
+
+    glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
 
     glTexCoord2f(0, 1);    glVertex2i(0, 0);
@@ -222,8 +248,15 @@ void draw_map()
 
     glEnd();
 
-    glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);
+
+
+    glTranslated(map_pos_u, map_pos_v, 0);
+
+    direcao();
+    
+
+    glDisable(GL_BLEND);
 
     glColor4f(1, 0, 0, 1);
 
@@ -231,10 +264,11 @@ void draw_map()
 
     glBegin(GL_POINTS);
 
-    glVertex2f(map_pos_u, map_pos_v);
+    glVertex2f(0, 0);
 
     glEnd();
 
+    glPopMatrix();
     glPopMatrix();
 
     glDisable(GL_TEXTURE_2D);
