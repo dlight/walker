@@ -68,7 +68,7 @@ float light_color[4] =           /* cor da luz 1            */
 
 float shininess = 0;             /* brilho do material      */  
 float diffuse[4]=                /* reflectancia difusa     */
-    { 1, 1, 1, 1 };
+    { 5, 5, 5, 1 };
 float ambient[4]=
     { 1, 1, 1, 1 };
 float specular[4]=               /* reflectancia especular  */
@@ -78,7 +78,7 @@ char key_pressed[512];           /* keymap continuo         */
 char key_hit[512];               /* keymap toggle           */
 
 char use_texture = 1;            /* usar modelo com textura */
-char use_fog = 1;
+char use_fog = 0;
 
 char hide_text = 1;              /* esconder texto          */
 char grab = 1;                   /* prender mouse na janela */
