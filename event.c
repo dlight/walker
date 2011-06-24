@@ -344,7 +344,6 @@ void physics(float dt)
 
     if (key_pressed['q']) {
         minha_altura += vel * dt;
-        printf("%f\n", minha_altura);
     }
     if (key_pressed['e']) {
         minha_altura -= vel * dt;

@@ -117,7 +117,8 @@ void sky()
         return;
     if (use_texture)
         glEnable(GL_TEXTURE_2D);
-	
+
+    glColor4f(1, 1, 1, 1);
     glBindTexture(GL_TEXTURE_2D, sky_textura);
     skyDraw();
 
