@@ -105,11 +105,28 @@ unsigned map_len_v;
 
 int altura_terreno;
 
+char interpolar_terreno = 0;
+
 unsigned screen_map_len = 200;
 
 int iu, iv;
 
 rgba* ruinas_map;
+
+int idx(int u, int v)
+{
+    return ruinas_map[(map_len_v - iv) * map_len_v + iu].r;
+}
+
+int m(a, b)
+{
+    return a > b ? a : b;
+}
+
+int mmax(int a, int b, int c, int d, int e, int f, int g, int h, int i)
+{
+    return m(a, m(b, m(c, m(d, m(e, m(f, m(g, m(h, i))))))));
+}
 
 void update_map_pos()
 {
@@ -128,9 +145,48 @@ void update_map_pos()
     iu = map_pos_u * mu;
     iv = map_pos_v * mv;
 
-    int i = (map_len_v - iv) * map_len_v + iu;
+    float eiu = 1 - (map_pos_u - iu / mu);
+    float eiv = 1 - (map_pos_v - iv / mv);
 
-    altura_terreno = ruinas_map[i].r;
+    int iup = iu+1, ium = iu-1;
+    int iup2 = iu+2, ium2 = iu-2;
+
+    int ivp = iv+1, ivm = iv-1;
+    int ivp2 = iv+2, ivm2 = iv-2;
+
+    float eiup = 1 / (map_pos_u - iup / mu);
+    float eium = 1 / (map_pos_u - ium / mu);
+
+    float eiup2 = 1 / (map_pos_u - iup2 / mu);
+    float eium2 = 1 / (map_pos_u - ium2 / mu);
+
+
+    float eivp = 1 / (map_pos_v - ivp / mv);
+    float eivm = 1 / (map_pos_v - ivm / mv);
+
+    float eivp2 = 1 / (map_pos_v - ivp2 / mv);
+    float eivm2 = 1 / (map_pos_v - ivm2 / mv);
+
+    float v0 = sqrt(eiu*eiu + eiv*eiv);
+    float v1u = sqrt(eiup*eiup + eivp*eivp);
+    float v1m = sqrt(eium*eium + eivm*eivm);
+
+    float q = (v0 * idx(iu, iv) + v1u * idx(iup, ivp) +
+               v1m * idx(ium, ivm)) / (v0 + v1u + v1m);
+ 
+    if (interpolar_terreno)
+        //altura_terreno = q;
+        altura_terreno = mmax(idx(iu, iv),
+                              idx(iu, ivp),
+                              idx(iup, iv),
+                              idx(iup, ivp),
+                              idx(iu, ivm),
+                              idx(ium, iv),
+                              idx(ium, ivm),
+                              idx(ium, ivp),
+                              idx(iup, ivm));
+    else
+        altura_terreno = idx(iu, iv);
 }
 
 void init_event_keys()
@@ -151,10 +207,11 @@ void update_status_str()
 
 
     snprintf(status_str[1], 256,
-             "c%6.3f,%6.3f,%6.3f h%.0f s%.2f d%.2f t%d l%d,%d",
+             "c%6.3f,%6.3f,%6.3f h%.0f s%.2f d%.2f t%d l%d,%d i%d",
              light_color[0], light_color[1], light_color[2],
              shininess, specular[0], diffuse[0], use_texture,
-             glIsEnabled(GL_LIGHT0), glIsEnabled(GL_LIGHT1));
+             glIsEnabled(GL_LIGHT0), glIsEnabled(GL_LIGHT1),
+             interpolar_terreno);
 }
 
 void update_fps_str(int count)
@@ -217,6 +274,7 @@ void toggle()
     TECLA_TOGGLE('p', stop_light);
 
     TECLA_TOGGLE('o', hide_text);
+    TECLA_TOGGLE('i', interpolar_terreno);
     TECLA_TOGGLE('4', use_sky);
     TECLA_TOGGLE('5', wireframe);
     TECLA_TOGGLE('6', show_map);
