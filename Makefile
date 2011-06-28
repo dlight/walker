@@ -5,9 +5,9 @@ HEADER = $(subst .obj,.h,$(wildcard mesh/*.obj))
 
 OS := $(shell uname -s)
 
-#CC = gcc -pipe -std=c99 -ggdb
+CC = gcc -pipe -std=c99 -ggdb
 
-CC = clang
+#CC = clang
 
 all : walker
 	@echo
@@ -48,7 +48,7 @@ texture.o : texture.c texture.h
 nanosec.o : nanosec.c nanosec.h
 	$(call compile,$<)
 
-event.o : event.c types.h event.h
+event.o : event.c types.h event.h $(HEADER)
 	$(call compile,$<)
 
 gl.o : gl.c gl.h types.h texture.h event.h $(HEADER)
@@ -65,6 +65,9 @@ debug : walker
 
 fs : walker
 	./walker -fs
+
+mac : walker
+	./walker -fs 1280 800
 
 note : walker
 	./walker -fs 1024 600

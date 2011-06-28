@@ -33,6 +33,8 @@ extern unsigned map_len_v;
 
 extern unsigned screen_map_len;
 
+extern void (*desenhar_terreno)(void);
+
 extern rgba* ruinas_map;
 
 extern float minha_altura;

@@ -50,16 +50,13 @@
 #include "texture.h"
 #include "event.h"
 
-#include "mesh/ruinas.h"
 #include "mesh/sky.h"
 
 #include "gl.h"
 
-GLuint ruinas_textura, ruinas_minimap, sky_textura;
+GLuint ruinas_minimap, ruinas_textura, sky_textura;
 
 int res_x = 800, res_y = 600;    /* resolucao padrao */
-
-void (*desenhar_terreno)(void) = ruinasDraw;
 
 
 
@@ -75,7 +72,7 @@ void projecao_3d()
     glLoadIdentity ();
     gluPerspective(60,
                    (GLfloat) res_x /
-                   (GLfloat) res_y, 0.01, 500);
+                   (GLfloat) res_y, 0.06, 300);	// near e far (tava 0.01 500)
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
 }
