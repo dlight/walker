@@ -45,6 +45,10 @@
 #include <GL/glut.h>
 #endif
 
+#include "mesh/ruinas.h"
+#include "mesh/ruinas_hires.h"
+#include "mesh/ruinas_hires2.h"
+
 #include "types.h"
 #include "event.h"
 
@@ -70,7 +74,7 @@ float shininess = 0;             /* brilho do material      */
 float diffuse[4]=                /* reflectancia difusa     */
     { 5, 5, 5, 1 };
 float ambient[4]=
-    { 1, 1, 1, 1 };
+    { 2, 2, 2, 1 };
 float specular[4]=               /* reflectancia especular  */
     { 0, 0, 0, 1 };
 
@@ -80,9 +84,9 @@ char key_hit[512];               /* keymap toggle           */
 char use_texture = 1;            /* usar modelo com textura */
 char use_fog = 0;
 
-char hide_text = 1;              /* esconder texto          */
+char hide_text = 0;              /* esconder texto          */
 char grab = 1;                   /* prender mouse na janela */
-char show_grid = 1;
+char show_grid = 0;
 char show_map = 1;
 
 char wireframe = 0;
@@ -98,6 +102,8 @@ float pos_map_y;
 char fps_str[8] = "0 FPS";       /* fps na tela             */
 char status_str[3][256];         /* variaveis na tela       */
 
+void (*desenhar_terreno)(void) = ruinasDraw;
+
 float map_pos_u;
 float map_pos_v;
 unsigned map_len_u;
@@ -105,7 +111,7 @@ unsigned map_len_v;
 
 int altura_terreno;
 
-char interpolar_terreno = 0;
+int interpolar_terreno = 1;
 
 unsigned screen_map_len = 200;
 
@@ -113,7 +119,7 @@ int iu, iv;
 
 rgba* ruinas_map;
 
-int idx(int u, int v)
+int idx()
 {
     return ruinas_map[(map_len_v - iv) * map_len_v + iu].r;
 }
@@ -145,48 +151,7 @@ void update_map_pos()
     iu = map_pos_u * mu;
     iv = map_pos_v * mv;
 
-    float eiu = 1 - (map_pos_u - iu / mu);
-    float eiv = 1 - (map_pos_v - iv / mv);
-
-    int iup = iu+1, ium = iu-1;
-    int iup2 = iu+2, ium2 = iu-2;
-
-    int ivp = iv+1, ivm = iv-1;
-    int ivp2 = iv+2, ivm2 = iv-2;
-
-    float eiup = 1 / (map_pos_u - iup / mu);
-    float eium = 1 / (map_pos_u - ium / mu);
-
-    float eiup2 = 1 / (map_pos_u - iup2 / mu);
-    float eium2 = 1 / (map_pos_u - ium2 / mu);
-
-
-    float eivp = 1 / (map_pos_v - ivp / mv);
-    float eivm = 1 / (map_pos_v - ivm / mv);
-
-    float eivp2 = 1 / (map_pos_v - ivp2 / mv);
-    float eivm2 = 1 / (map_pos_v - ivm2 / mv);
-
-    float v0 = sqrt(eiu*eiu + eiv*eiv);
-    float v1u = sqrt(eiup*eiup + eivp*eivp);
-    float v1m = sqrt(eium*eium + eivm*eivm);
-
-    float q = (v0 * idx(iu, iv) + v1u * idx(iup, ivp) +
-               v1m * idx(ium, ivm)) / (v0 + v1u + v1m);
- 
-    if (interpolar_terreno)
-        //altura_terreno = q;
-        altura_terreno = mmax(idx(iu, iv),
-                              idx(iu, ivp),
-                              idx(iup, iv),
-                              idx(iup, ivp),
-                              idx(iu, ivm),
-                              idx(ium, iv),
-                              idx(ium, ivm),
-                              idx(ium, ivp),
-                              idx(iup, ivm));
-    else
-        altura_terreno = idx(iu, iv);
+	altura_terreno = idx();
 }
 
 void init_event_keys()
@@ -275,13 +240,40 @@ void toggle()
 
     TECLA_TOGGLE('o', hide_text);
     TECLA_TOGGLE('i', interpolar_terreno);
+	
+	
     TECLA_TOGGLE('4', use_sky);
     TECLA_TOGGLE('5', wireframe);
     TECLA_TOGGLE('6', show_map);
     TECLA_TOGGLE('7', show_grid);
     TECLA_TOGGLE('8', use_heightmap);
-    TECLA_TOGGLE('9', use_fog);
+
+    LIDAR_COM_TECLA('9', {
+			if (use_fog) {
+			use_fog = 0;
+			} else {
+				use_fog = 1;
+				use_sky = 0;
+			}
+		});
+	
     TECLA_TOGGLE('0', use_texture);
+	
+	LIDAR_COM_TECLA('1',
+                    {
+						desenhar_terreno = ruinasDraw;
+                    });
+	
+	LIDAR_COM_TECLA('2',
+                    {
+						desenhar_terreno = ruinas_hiresDraw;
+                    });
+	
+	LIDAR_COM_TECLA('3',
+                    {
+						desenhar_terreno = ruinas_hires2Draw;
+                    });
+	
 
     LIDAR_COM_TECLA(SDLK_F2,
                     {
@@ -323,7 +315,7 @@ void toggle()
 
 void model(float dt)
 {
-    float vel_vel = 1;
+    float vel_vel = 0.01;
 
     float color_vel = 0.8;
     float param_vel = 100;
