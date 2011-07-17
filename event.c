@@ -261,17 +261,17 @@ void toggle()
 	
 	LIDAR_COM_TECLA('1',
                     {
-						desenhar_terreno = ruinasDraw;
+			desenhar_terreno = ruinasDraw;
                     });
 	
 	LIDAR_COM_TECLA('2',
                     {
-						desenhar_terreno = ruinas_hiresDraw;
+			desenhar_terreno = ruinas_hiresDraw;
                     });
 	
 	LIDAR_COM_TECLA('3',
                     {
-						desenhar_terreno = ruinas_hires2Draw;
+			desenhar_terreno = ruinas_hires2Draw;
                     });
 	
 
@@ -280,20 +280,6 @@ void toggle()
                         SDL_WM_GrabInput(SDL_GRAB_OFF);
                         SDL_ShowCursor(SDL_ENABLE);
                         grab = 0;
-                    });
-
-    LIDAR_COM_TECLA('j',
-                    {
-                        light_color[0] = 0.8;
-                        light_color[1] = 1;
-                        light_color[2] = 0.8;
-                    });
-
-    LIDAR_COM_TECLA('k',
-                    {
-                        light_color[0] = 1;
-                        light_color[1] = 1;
-                        light_color[2] = 1;
                     });
 
     LIDAR_COM_TECLA('-',
@@ -315,11 +301,11 @@ void toggle()
 
 void model(float dt)
 {
-    float vel_vel = 0.01;
+    float vel_vel = 1;
 
     float color_vel = 0.8;
-    float param_vel = 100;
-    float shin_vel = 50;
+    float param_vel = 5;
+    float shin_vel = 5;
 
     float c = color_vel * dt;
     float p = param_vel * dt;
@@ -329,20 +315,6 @@ void model(float dt)
 
     if (key_pressed['c'])
         vel -= vel_vel * dt;
-
-    if (key_pressed['r'])
-        light_color[0] += c;
-    if (key_pressed['t'])
-        light_color[0] -= c;
-    if (key_pressed['f'])
-        light_color[1] += c;
-    if (key_pressed['g'])
-        light_color[1] -= c;
-    if (key_pressed['v'])
-        light_color[2] += c;
-    if (key_pressed['b'])
-        light_color[2] -= c;
-
 
     if (key_pressed['y']) {
         diffuse[0] += p;
