@@ -5,9 +5,9 @@ HEADER = $(subst .obj,.h,$(wildcard mesh/*.obj))
 
 OS := $(shell uname -s)
 
-CC = gcc -pipe -std=c99 -ggdb
+#CC = gcc -pipe -std=c99
 
-#CC = clang
+CC = clang
 
 all : walker
 	@echo
@@ -22,7 +22,7 @@ mesh/%.c mesh/%.h : mesh/%.obj
 	./tools/obj2opengl.pl -noScale -noMove $<
 
 mesh/%.o : mesh/%.c
-	$(CC) -pipe -c -o $@ $<
+	$(CC) -c -o $@ $<
 
 use = `pkg-config --$(1) $(2)`
 
