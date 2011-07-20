@@ -26,8 +26,7 @@ rgba* load_png(char* filename, unsigned* width,
     }
  
     png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-                                                 NULL,
-                                                 NULL, NULL);
+                                                 NULL, NULL, NULL);
     if (!png_ptr) {
         fclose(fp);
         printf("no png ptr\n");
@@ -105,14 +104,9 @@ GLuint setup_texture(rgba* image_data, unsigned w,
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_LINEAR_MIPMAP_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                    GL_LINEAR_MIPMAP_NEAREST);
 	
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);	
-	
-		//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
     gluBuild2DMipmaps( GL_TEXTURE_2D, 4, w, h,
                        GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) image_data );

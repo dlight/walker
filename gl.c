@@ -47,6 +47,8 @@
 #endif
 
 #include "types.h"
+#include "gl_error.h"
+
 #include "texture.h"
 #include "event.h"
 
@@ -281,7 +283,6 @@ void draw_map()
     glEnd();
 
     glPopMatrix();
-    glPopMatrix();
 
     glDisable(GL_TEXTURE_2D);
 
@@ -358,6 +359,8 @@ void draw()
 
     desenhar_mundo_2d();
 
+    GL_ERROR("uhm");
+
     SDL_GL_SwapBuffers();
 }
 
@@ -416,5 +419,5 @@ void carregar_texturas()
                     &ruinas_map, &map_len_u,
                     &map_len_v);
 	
-	sky_textura = png_texture("./mesh/sky.png");
+    sky_textura = png_texture("./mesh/sky.png");
 }
