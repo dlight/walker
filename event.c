@@ -46,8 +46,6 @@
 #endif
 
 #include "mesh/ruinas.h"
-#include "mesh/ruinas_hires.h"
-#include "mesh/ruinas_hires2.h"
 
 #include "types.h"
 #include "event.h"
@@ -258,21 +256,6 @@ void toggle()
 		});
 	
     TECLA_TOGGLE('0', use_texture);
-	
-	LIDAR_COM_TECLA('1',
-                    {
-			desenhar_terreno = ruinasDraw;
-                    });
-	
-	LIDAR_COM_TECLA('2',
-                    {
-			desenhar_terreno = ruinas_hiresDraw;
-                    });
-	
-	LIDAR_COM_TECLA('3',
-                    {
-			desenhar_terreno = ruinas_hires2Draw;
-                    });
 	
 
     LIDAR_COM_TECLA(SDLK_F2,
