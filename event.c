@@ -52,7 +52,7 @@
 
 #define KM_H (1000.f / 3600.f)
 
-float vel = 60 * KM_H;           /* velocidade linear, km/h */
+float vel = 6 * KM_H;            /* velocidade linear, km/h */
 float ang_vel = 0.2 ;            /* velocidade angular      */
 
 float theta = 0;                 /* orientacao no plano xz  */
@@ -66,13 +66,13 @@ float light[4] =                 /* posicao da luz 0        */
 char stop_light = 0;             /* luz 0 esta parada?      */
 
 float light_color[4] =           /* cor da luz 1            */
-    { 0.5, 0.5, 0.5, 0 };
+    { 3, 3, 3, 0 };
 
 float shininess = 0;             /* brilho do material      */  
 float diffuse[4]=                /* reflectancia difusa     */
-    { 5, 5, 5, 1 };
+    { 1, 1, 1, 1 };
 float ambient[4]=
-    { 2, 2, 2, 1 };
+    { 1, 1, 1, 1 };
 float specular[4]=               /* reflectancia especular  */
     { 0, 0, 0, 1 };
 
@@ -118,16 +118,6 @@ rgba* ruinas_map;
 int idx()
 {
     return ruinas_map[(map_len_v - iv) * map_len_v + iu].r;
-}
-
-int m(a, b)
-{
-    return a > b ? a : b;
-}
-
-int mmax(int a, int b, int c, int d, int e, int f, int g, int h, int i)
-{
-    return m(a, m(b, m(c, m(d, m(e, m(f, m(g, m(h, i))))))));
 }
 
 void update_map_pos()

@@ -59,8 +59,6 @@ GLuint ruinas_minimap, ruinas_textura, sky_textura;
 
 int res_x = 800, res_y = 600;    /* resolucao padrao */
 
-void (*desenhar_terreno)(void) = ruinasDraw;
-
 // -----     -----------------     ----- //
 // |                                   | //
 // |              MUNDO 3D             | //
@@ -101,7 +99,7 @@ void posicionar_luzes()
 
 void fog() {
     if (use_fog) {
-            glClearColor (0.3, 0.3, 0.3, 0);
+            glClearColor (0.2, 0.2, 0.2, 0);
             glEnable(GL_FOG);
     }
     else {
@@ -116,8 +114,8 @@ void sky()
     if (use_texture)
         glEnable(GL_TEXTURE_2D);
 
-    glColor4f(1, 1, 1, 1);
-    skyDraw();
+    glColor4f(0.3, 0.3, 0.3, 1);
+    draw_mesh(MESH_SKY);
 
     glDisable(GL_TEXTURE_2D);
 }
@@ -128,7 +126,7 @@ void terreno()
     if (use_texture)
         glEnable(GL_TEXTURE_2D);
 
-    desenhar_terreno();
+    draw_mesh(MESH_RUINAS);
 
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_LIGHTING);
@@ -168,18 +166,40 @@ void draw_light_point()
     glEnd();
 }
 
+void draw_char()
+{
+    glEnable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
+
+    float shininessq = 100;
+    float specularq[4]=
+    { 2, 2, 2, 1 };
+
+    glMaterialfv(GL_FRONT, GL_SHININESS, &shininessq);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specularq);
+
+    draw_mesh(MESH_CHAR);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_LIGHTING);
+}
+
 void desenhar_mundo_3d()
 {
     glEnable(GL_DEPTH_TEST);
 
     fog();
 
+    draw_light_point();
 
     linhas();
+
+    glColor3f(0, 0, 100);
+
     terreno();
-    draw_light_point();
-	    glDisable(GL_FOG);
-	sky();
+    draw_char();
+    glDisable(GL_FOG);
+
+    sky();
 
     glDisable(GL_DEPTH_TEST);
 }
@@ -212,15 +232,15 @@ void direcao()
 
     glBegin(GL_TRIANGLES);
 
-    glColor4f(0, 1, 0, 0.1);
+    glColor4f(0, 1, 0, 0.0);
 
-    glVertex2f(-5, 15);
+    glVertex2f(-10, 20);
 
-    glColor4f(0, 1, 0, 0.4);
+    glColor4f(0, 1, 0, 0.2);
     glVertex2f(0, 0);
 
-    glColor4f(0, 1, 0, 0.1);
-    glVertex2f(5, 15);
+    glColor4f(0, 1, 0, 0.0);
+    glVertex2f(10, 20);
 
     glEnd();
 
@@ -238,7 +258,7 @@ void draw_map()
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glColor4f (0.5, 0.8, 1, 0.6);
+    glColor4f (0.9, 0.8, 1, 0.4);
 
     int m = 5;
 
@@ -339,7 +359,6 @@ void initdraw()
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
 
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glColor3f (1.0, 1.0, 1.0);
 }
 
 void draw()
@@ -385,11 +404,12 @@ void initgl()
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
 
     glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.001);
-    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.0001);
+    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.1);
 
     glEnable(GL_LIGHT1);
 
-    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.1);
+    //glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 1);
+    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.1);
 
     float luz0[]={ 10, 10, 10, 1 };
 
@@ -397,7 +417,7 @@ void initgl()
     glLightfv(GL_LIGHT0, GL_SPECULAR, luz0);
 
 
-    GLfloat fogColor[4]= {0.3, 0.3, 0.3, 1};
+    GLfloat fogColor[4]= {0.2, 0.2, 0.2, 1};
 
 
     glFogi(GL_FOG_MODE, GL_EXP);
