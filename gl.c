@@ -37,7 +37,6 @@
 
  */
 
-
 #define GL_GLEXT_PROTOTYPES
 
 #ifdef MAC
@@ -52,7 +51,7 @@
 #include "texture.h"
 #include "event.h"
 
-#include "mesh/sky.h"
+#include "mesh/mesh_ctrl.h"
 
 #include "gl.h"
 
@@ -60,7 +59,7 @@ GLuint ruinas_minimap, ruinas_textura, sky_textura;
 
 int res_x = 800, res_y = 600;    /* resolucao padrao */
 
-
+void (*desenhar_terreno)(void) = ruinasDraw;
 
 // -----     -----------------     ----- //
 // |                                   | //
@@ -118,7 +117,6 @@ void sky()
         glEnable(GL_TEXTURE_2D);
 
     glColor4f(1, 1, 1, 1);
-    glBindTexture(GL_TEXTURE_2D, sky_textura);
     skyDraw();
 
     glDisable(GL_TEXTURE_2D);
@@ -130,7 +128,6 @@ void terreno()
     if (use_texture)
         glEnable(GL_TEXTURE_2D);
 
-    glBindTexture(GL_TEXTURE_2D, ruinas_textura);
     desenhar_terreno();
 
     glDisable(GL_TEXTURE_2D);
@@ -412,12 +409,10 @@ void initgl()
 
 void carregar_texturas()
 {
-    ruinas_textura = png_texture("./mesh/ruinas.png");
+    mesh_init();
 
     ruinas_minimap =
         png_loadmap("./mesh/ruinas_map.png",
                     &ruinas_map, &map_len_u,
                     &map_len_v);
-	
-    sky_textura = png_texture("./mesh/sky.png");
 }

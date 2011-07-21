@@ -45,9 +45,9 @@
 #include <GL/glut.h>
 #endif
 
-#include "mesh/ruinas.h"
-
 #include "types.h"
+#include "texture.h"
+
 #include "event.h"
 
 #define KM_H (1000.f / 3600.f)
@@ -99,8 +99,6 @@ float pos_map_y;
 
 char fps_str[8] = "0 FPS";       /* fps na tela             */
 char status_str[3][256];         /* variaveis na tela       */
-
-void (*desenhar_terreno)(void) = ruinasDraw;
 
 float map_pos_u;
 float map_pos_v;

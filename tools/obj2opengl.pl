@@ -158,9 +158,10 @@ sub handleArguments() {
         $zcen = $center[2];
     }
     
-    if($#ARGV == 0) {
+    if($#ARGV == 1) {
         my ($file, $dir, $ext) = fileparse($ARGV[0], qr/\.[^.]*/);
         $inFilename = $dir . $file . $ext;
+	$tex_file = $ARGV[1];
     } else {
         $errorInOptions = true;
     }
@@ -471,7 +472,9 @@ sub writeOutput {
         print OUTFILE_C "  float texcoord[2];\n" if $numTexture > 0;
         print OUTFILE_C "} ".$object."Data_t;\n\n";
 
-        print OUTFILE "extern ".$object."Data_t ".$object."Data[];\n\n";
+        print OUTFILE "extern mesh_t ".$object."Data[];\n\n";
+
+        print OUTFILE "GLuint ".$object."_textura;\n\n";
 
         print OUTFILE_C $object."Data_t ".$object."Data[] = {\n";
 	for($j = 0; $j < $numFaces; $j++){
@@ -522,7 +525,7 @@ sub writeOutput {
 
 	print OUTFILE "static const GLsizei ".$object."NumVerts = ".($numFaces * 3).";\n\n";
 
-        print OUTFILE "static const GLsizei ".$object."Stride = sizeof(".$object."Data_t);\n\n";
+        print OUTFILE "static const GLsizei ".$object."Stride = sizeof(mesh_t);\n\n";
 
         print OUTFILE "static const float *".$object."Verts = ".$object."Data[0].vertex;\n";
         print OUTFILE "static const float *".$object."Normals = ".$object."Data[0].normal;\n" if $numNormals > 0;
@@ -530,6 +533,8 @@ sub writeOutput {
         print OUTFILE "\n";
 
         print OUTFILE "static void ".$object."Draw(void){\n";
+
+	print OUTFILE "  glBindTexture(GL_TEXTURE_2D, ".$object."_textura);\n";
 
         print OUTFILE "  glEnableClientState(GL_VERTEX_ARRAY);\n";
         print OUTFILE "  glEnableClientState(GL_NORMAL_ARRAY);\n" if $numNormals > 0;
@@ -546,6 +551,10 @@ sub writeOutput {
         print OUTFILE "  glDisableClientState(GL_VERTEX_ARRAY);\n";
 
         print OUTFILE "}\n";
+
+	print OUTFILE "void ".$object."_init(){\n";
+	print OUTFILE "  ".$object."_textura = png_texture(\"".$tex_file."\");";
+	print OUTFILE "\n}\n";
 	
 	close OUTFILE;
 }

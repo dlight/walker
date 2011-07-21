@@ -14,4 +14,10 @@ typedef struct {
     unsigned char a;
  } rgba;
 
+typedef struct {
+  float vertex[3];
+  float normal[3];
+  float texcoord[2];
+} mesh_t;
+
 #endif

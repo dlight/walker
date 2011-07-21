@@ -18,11 +18,15 @@ all : walker
 	@echo digite ./walker para rodar o programa
 	@echo para mais informacoes leia o README
 
-mesh/%.c mesh/%.h : mesh/%.obj
-	./tools/obj2opengl.pl -noScale -noMove $<
+mesh/%.c mesh/%.h : mesh/%.obj tools/obj2opengl.pl Makefile
+	./tools/obj2opengl.pl -noScale -noMove $< \
+		$$(echo $< |sed 's/.obj$$/.png/')
 
 mesh/%.o : mesh/%.c
 	$(CC) -c -o $@ $<
+
+mesh/mesh_ctrl.h : mk-mesh-ctrl.sh $(HEADER)
+	./mk-mesh-ctrl.sh $^ > $@
 
 use = `pkg-config --$(1) $(2)`
 
@@ -48,10 +52,10 @@ texture.o : texture.c texture.h
 nanosec.o : nanosec.c nanosec.h
 	$(call compile,$<)
 
-event.o : event.c types.h event.h $(HEADER)
+event.o : event.c types.h event.h
 	$(call compile,$<)
 
-gl.o : gl.c gl.h types.h texture.h event.h $(HEADER)
+gl.o : gl.c gl.h types.h texture.h event.h mesh/mesh_ctrl.h
 	$(call compile,$<)
 
 walker: nanosec.o texture.o event.o gl.o walker.o $(OBJ)
@@ -79,7 +83,7 @@ clean-mesh :
 	rm -f mesh/*.o
 
 clean-mesh-source :
-	rm -f mesh/*.{h,c}
+	rm -f mesh/*.h mesh/*.c
 
 clean-code : clean clean-mesh
 
